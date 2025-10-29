@@ -1,0 +1,110 @@
+<!-- index.html - Main entry point for the shopping app SPA -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation without band, positioned absolutely on the image -->
+    <nav class="navbar">
+        <button id="menu-toggle" class="menu-toggle">☰</button>
+        <div class="logo">Shopping App</div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#" data-page="home" data-lang="home">Accueil</a></li>
+            <li><a href="#" data-page="products" data-lang="products">Produits</a></li>
+            <li><a href="#" data-page="lists" data-lang="lists">Liste de courses</a></li>
+            <li><a href="#" data-page="contact" data-lang="contact">Contact</a></li>
+            <li><a href="#" data-page="auth" data-lang="auth">Inscription/Connexion</a></li>
+            <!-- Mobile controls: theme and languages in column in hamburger -->
+            <li class="nav-controls-mobile">
+                <button id="theme-toggle-mobile" data-lang="toggle-theme">🌙</button>
+                <select id="lang-select-mobile">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="de">Deutsch</option>
+                    <option value="pt">Português</option>
+                    <option value="ko">한국어</option>
+                </select>
+            </li>
+        </ul>
+        <!-- PC controls: visible at top right -->
+        <div class="nav-controls">
+            <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
+            <select id="lang-select">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="pt">Português</option>
+                <option value="ko">한국어</option>
+            </select>
+        </div>
+    </nav>
+
+    <!-- Dynamic SPA content -->
+    <main id="app">
+        <section id="home-page" class="page active">
+            <h1 data-lang="welcome">Bienvenue sur Shopping App</h1>
+            <p data-lang="intro">Organisez vos cours facilement.</p>
+        </section>
+        <!-- Products page -->
+        <section id="products-page" class="page">
+            <h1 data-lang="products">Produits</h1>
+            <div id="products-container">
+                <!-- Products will be loaded here via JS -->
+            </div>
+        </section>
+        
+        <!-- Lists page -->
+        <section id="lists-page" class="page">
+            <h1 data-lang="lists">Liste de courses</h1>
+            <div id="lists-container">
+                <!-- Shopping lists will be loaded here via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth page -->
+<section id="auth-page" class="page">
+  <h1 data-lang="auth">Inscription / Connexion</h1>
+
+  <!-- Formulaire d'inscription -->
+  <h2>Inscription</h2>
+  <form id="register-form">
+    <input type="hidden" name="action" value="register">
+    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit">S'inscrire</button>
+  </form>
+  <p id="register-message"></p>
+
+  <!-- Formulaire de connexion -->
+  <h2>Connexion</h2>
+  <form id="login-form">
+    <input type="hidden" name="action" value="login">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
+  </form>
+  <p id="login-message"></p>
+</section>
+
+
+
+    <!-- Footer stuck at bottom -->
+    <footer>
+        <p data-lang="footer">© 2025 Shopping App. <a href="#" data-lang="cgv">CGV</a> | <a href="#" data-lang="legal">Mentions légales</a></p>
+    </footer>
+
+    <script src="js/lang.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
