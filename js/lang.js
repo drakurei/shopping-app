@@ -21,6 +21,10 @@ const translations = {
         'Outils de Cuisine': "Outils de Cuisine",
         'Pomme': "Pomme",
         'Banane': "Banane",
+        'Tomate': "Tomate",  // Ajouté
+        'Brocoli': "Brocoli",  // Ajouté
+        'Carotte': "Carotte",  // Ajouté
+        'Courgette': "Courgette",  // Ajouté
         'Poulet': "Poulet",
         'Boeuf': "Boeuf",
         'Lait': "Lait",
@@ -38,7 +42,9 @@ const translations = {
         remove: "Supprimer",
         name: "Nom",
         quantity: "Quantité",
-        price: "Prix"
+        price: "Prix",
+        actions: "Actions",  // Ajouté
+        noItems: "Aucun article dans la liste"  // Ajouté
     },
     en: {
         welcome: "Welcome to Shopping App",
@@ -61,6 +67,10 @@ const translations = {
         'Outils de Cuisine': "Kitchen Tools",
         'Pomme': "Apple",
         'Banane': "Banana",
+        'Tomate': "Tomato",  // Ajouté
+        'Brocoli': "Broccoli",  // Ajouté
+        'Carotte': "Carrot",  // Ajouté
+        'Courgette': "Zucchini",  // Ajouté
         'Poulet': "Chicken",
         'Boeuf': "Beef",
         'Lait': "Milk",
@@ -78,7 +88,9 @@ const translations = {
         remove: "Remove",
         name: "Name",
         quantity: "Quantity",
-        price: "Price"
+        price: "Price",
+        actions: "Actions",  // Ajouté
+        noItems: "No items in list"  // Ajouté
     },
     es: {  // Spanish
         welcome: "Bienvenido a Shopping App",
@@ -101,6 +113,10 @@ const translations = {
         'Outils de Cuisine': "Herramientas de Cocina",
         'Pomme': "Manzana",
         'Banane': "Plátano",
+        'Tomate': "Tomate",  // Ajouté
+        'Brocoli': "Brócoli",  // Ajouté
+        'Carotte': "Zanahoria",  // Ajouté
+        'Courgette': "Calabacín",  // Ajouté
         'Poulet': "Pollo",
         'Boeuf': "Carne de res",
         'Lait': "Leche",
@@ -118,7 +134,9 @@ const translations = {
         remove: "Eliminar",
         name: "Nombre",
         quantity: "Cantidad",
-        price: "Precio"
+        price: "Precio",
+        actions: "Acciones",  // Ajouté
+        noItems: "No hay artículos en la lista"  // Ajouté
     },
     de: {  // German
         welcome: "Willkommen bei Shopping App",
@@ -141,6 +159,10 @@ const translations = {
         'Outils de Cuisine': "Küchenwerkzeuge",
         'Pomme': "Apfel",
         'Banane': "Banane",
+        'Tomate': "Tomate",  // Ajouté
+        'Brocoli': "Brokkoli",  // Ajouté
+        'Carotte': "Karotte",  // Ajouté
+        'Courgette': "Zucchini",  // Ajouté
         'Poulet': "Hähnchen",
         'Boeuf': "Rindfleisch",
         'Lait': "Milch",
@@ -158,7 +180,9 @@ const translations = {
         remove: "Entfernen",
         name: "Name",
         quantity: "Menge",
-        price: "Preis"
+        price: "Preis",
+        actions: "Aktionen",  // Ajouté
+        noItems: "Keine Artikel in der Liste"  // Ajouté
     },
     pt: {  // Portuguese
         welcome: "Bem-vindo ao Shopping App",
@@ -181,6 +205,10 @@ const translations = {
         'Outils de Cuisine': "Ferramentas de Cozinha",
         'Pomme': "Maçã",
         'Banane': "Banana",
+        'Tomate': "Tomate",  // Ajouté
+        'Brocoli': "Brócolis",  // Ajouté
+        'Carotte': "Cenoura",  // Ajouté
+        'Courgette': "Abobrinha",  // Ajouté
         'Poulet': "Frango",
         'Boeuf': "Carne bovina",
         'Lait': "Leite",
@@ -198,7 +226,9 @@ const translations = {
         remove: "Remover",
         name: "Nome",
         quantity: "Quantidade",
-        price: "Preço"
+        price: "Preço",
+        actions: "Ações",  // Ajouté
+        noItems: "Nenhum item na lista"  // Ajouté
     },
     ko: {  // Korean
         welcome: "쇼핑 앱에 오신 것을 환영합니다",
@@ -221,6 +251,10 @@ const translations = {
         'Outils de Cuisine': "주방 도구",
         'Pomme': "사과",
         'Banane': "바나나",
+        'Tomate': "토마토",  // Ajouté
+        'Brocoli': "브로콜리",  // Ajouté
+        'Carotte': "당근",  // Ajouté
+        'Courgette': "애호박",  // Ajouté
         'Poulet': "닭고기",
         'Boeuf': "소고기",
         'Lait': "우유",
@@ -238,7 +272,9 @@ const translations = {
         remove: "제거",
         name: "이름",
         quantity: "수량",
-        price: "가격"
+        price: "가격",
+        actions: "작업",  // Ajouté
+        noItems: "목록에 항목 없음"  // Ajouté
     }
 };
 

@@ -316,33 +316,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Load shopping lists
         function loadLists() {
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'action=get',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.getElementById('lists-body');
-                tbody.innerHTML = '';
-                if (data.success) {
-                    data.lists.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${item.product_name}</td>
-                            <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)"></td>
-                            <td>${item.price} €</td>
-                            <td><button onclick="removeItem(${item.id})" data-lang="remove">Remove</button></td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="4">No list found</td></tr>';
-                }
-            })
-            .catch(error => console.error('Error loading lists:', error));
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=get',
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const tbody = document.getElementById('lists-body');
+        tbody.innerHTML = '';
+        if (data.success && data.lists.length > 0) {
+            data.lists.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.product_name}</td>
+                    <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)"></td>
+                    <td>${item.price} €</td>
+                    <td><button onclick="removeItem(${item.id})" data-lang="remove">Remove</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" data-lang="noItems">No items in the list</td></tr>';
         }
+    })
+    .catch(error => console.error('Error loading lists:', error));
+}
 
         // Update quantity
         function updateQuantity(id, quantity) {
@@ -372,6 +372,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 else alert('Removal error');
             });
         }
+
+        // Add new item
+        document.getElementById('add-new-item')?.addEventListener('click', () => {
+            const productName = prompt('Product name:');
+            const price = parseFloat(prompt('Price (€):'));
+            if (productName && price > 0) {
+                fetch('api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=add&product_name=${encodeURIComponent(productName)}&price=${price}`,
+                    credentials: 'include'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) loadLists(); // Reload the list
+                    else alert('Add error');
+                });
+            }
+        });
 
         // User profile
         const userProfile = document.getElementById('user-profile');

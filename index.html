@@ -36,31 +36,31 @@
         </ul>
         <!-- PC controls: visible at top right -->
         <div class="nav-controls">
-    <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
-    <div id="user-profile" style="display: none;">
-        <span id="user-initial"></span>
-        <div id="profile-menu" style="display: none;">
-            <a href="#" id="view-lists" data-lang="lists">Mes listes</a>
-            <a href="#" id="view-profile" data-lang="profile">Profil</a>
-            <a href="#" id="logout" data-lang="logout">Déconnexion</a>
+            <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
+            <div id="user-profile" style="display: none;">
+                <span id="user-initial"></span>
+                <div id="profile-menu" style="display: none;">
+                    <a href="#" id="view-lists" data-lang="lists">Mes listes</a>
+                    <a href="#" id="view-profile" data-lang="profile">Profil</a>
+                    <a href="#" id="logout" data-lang="logout">Déconnexion</a>
+                </div>
+            </div>
+            <select id="lang-select">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="pt">Português</option>
+                <option value="ko">한국어</option>
+            </select>
         </div>
-    </div>
-    <select id="lang-select">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <option value="de">Deutsch</option>
-        <option value="pt">Português</option>
-        <option value="ko">한국어</option>
-    </select>
-</div>
     </nav>
 
     <!-- Dynamic SPA content -->
     <main id="app">
         <section id="home-page" class="page active">
             <h1 data-lang="welcome">Bienvenue sur Shopping App</h1>
-            <p data-lang="intro">Organisez vos cours facilement.</p>
+            <p data-lang="intro">Organisez vos courses facilement.</p>
         </section>
         <!-- Products page -->
         <section id="products-page" class="page">
@@ -70,7 +70,8 @@
             </div>
         </section>
         
-        <section id="lists-page" class="page">
+        <!-- Lists page -->
+       <section id="lists-page" class="page">
     <h1 data-lang="lists">Liste de courses</h1>
     <div id="lists-container">
         <table id="lists-table">
@@ -79,11 +80,11 @@
                     <th data-lang="name">Nom</th>
                     <th data-lang="quantity">Quantité</th>
                     <th data-lang="price">Prix</th>
-                    <th>Actions</th>
+                    <th data-lang="actions">Actions</th>
                 </tr>
             </thead>
             <tbody id="lists-body">
-                <!-- Shopping lists will be loaded here via JS -->
+                <!-- Les lignes seront ajoutées dynamiquement -->
             </tbody>
         </table>
     </div>
