@@ -36,16 +36,24 @@
         </ul>
         <!-- PC controls: visible at top right -->
         <div class="nav-controls">
-            <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
-            <select id="lang-select">
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-                <option value="pt">Português</option>
-                <option value="ko">한국어</option>
-            </select>
+    <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
+    <div id="user-profile" style="display: none;">
+        <span id="user-initial"></span>
+        <div id="profile-menu" style="display: none;">
+            <a href="#" id="view-lists" data-lang="lists">Mes listes</a>
+            <a href="#" id="view-profile" data-lang="profile">Profil</a>
+            <a href="#" id="logout" data-lang="logout">Déconnexion</a>
         </div>
+    </div>
+    <select id="lang-select">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="de">Deutsch</option>
+        <option value="pt">Português</option>
+        <option value="ko">한국어</option>
+    </select>
+</div>
     </nav>
 
     <!-- Dynamic SPA content -->
@@ -62,13 +70,24 @@
             </div>
         </section>
         
-        <!-- Lists page -->
         <section id="lists-page" class="page">
-            <h1 data-lang="lists">Liste de courses</h1>
-            <div id="lists-container">
+    <h1 data-lang="lists">Liste de courses</h1>
+    <div id="lists-container">
+        <table id="lists-table">
+            <thead>
+                <tr>
+                    <th data-lang="name">Nom</th>
+                    <th data-lang="quantity">Quantité</th>
+                    <th data-lang="price">Prix</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="lists-body">
                 <!-- Shopping lists will be loaded here via JS -->
-            </div>
-        </section>
+            </tbody>
+        </table>
+    </div>
+</section>
     </main>
 
     <!-- Auth page -->

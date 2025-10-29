@@ -1,4 +1,5 @@
 <?php
+// Enable all error reporting for debugging
 error_reporting(E_ALL);
 // Do not display PHP errors directly in responses. Convert errors/exceptions to JSON responses.
 ini_set('display_errors', 0);
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 header('Content-Type: application/json');
 
 if (!isLoggedIn()) {
-    echo json_encode(['success' => false, 'message' => 'Non connecté']);
+    echo json_encode(['success' => false, 'message' => 'Not logged in']);
     exit;
 }
 
@@ -57,14 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare("INSERT INTO shopping_lists (user_id, product_name, quantity, price) VALUES (?, ?, ?, ?)");
         if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Erreur préparation: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
             exit;
         }
         $stmt->bind_param("isid", $user_id, $product_name, $quantity, $price);
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Produit ajouté']);
+            echo json_encode(['success' => true, 'message' => 'Product added']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Erreur ajout: ' . $stmt->error]);
+            echo json_encode(['success' => false, 'message' => 'Add error: ' . $stmt->error]);
         }
         $stmt->close();
     } elseif ($action === 'remove') {
@@ -72,20 +73,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare("DELETE FROM shopping_lists WHERE id = ? AND user_id = ?");
         if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Erreur préparation: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
             exit;
         }
         $stmt->bind_param("ii", $id, $user_id);
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Produit supprimé']);
+            echo json_encode(['success' => true, 'message' => 'Product removed']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Erreur suppression: ' . $stmt->error]);
+            echo json_encode(['success' => false, 'message' => 'Removal error: ' . $stmt->error]);
+        }
+        $stmt->close();
+    } elseif ($action === 'update') {
+        // Added update action for quantity
+        $id = $_POST['id'];
+        $quantity = $_POST['quantity'];
+
+        $stmt = $conn->prepare("UPDATE shopping_lists SET quantity = ? WHERE id = ? AND user_id = ?");
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
+            exit;
+        }
+        $stmt->bind_param("iii", $quantity, $id, $user_id);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Quantity updated']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Update error: ' . $stmt->error]);
         }
         $stmt->close();
     } elseif ($action === 'get') {
         $stmt = $conn->prepare("SELECT id, product_name, quantity, price FROM shopping_lists WHERE user_id = ?");
         if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Erreur préparation: ' . $conn->error]);
+            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
             exit;
         }
         $stmt->bind_param("i", $user_id);
@@ -100,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
 }
 $conn->close();
 ?>

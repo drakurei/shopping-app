@@ -31,15 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-// Hamburger Menu Toggle
-const menuToggle = document.getElementById('menu-toggle');
-const navLinksEl = document.getElementById('nav-links');
+    // Hamburger Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinksEl = document.getElementById('nav-links');
 
-if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-        if (navLinksEl) navLinksEl.classList.toggle('active');
-    });
-}
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            if (navLinksEl) navLinksEl.classList.toggle('active');
+        });
+    }
 
     // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -174,54 +174,54 @@ if (menuToggle) {
 
                 const button = card.querySelector('button');
                 button.addEventListener('click', () => {
-    console.log('Tentative d\'ajout au panier pour :', product.name);
-    fetch('api.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=add&product_name=${encodeURIComponent(product.name)}&price=${parseFloat(product.price.replace(' €', ''))}`,
-        credentials: 'include' // Add to send session cookies
-    })
-    .then(async response => {
-        console.log('Réponse reçue :', response);
-        const text = await response.text();
-        const contentType = response.headers.get('content-type') || '';
-        if (!response.ok) {
-            console.error('HTTP error', response.status, text);
-            throw new Error('Erreur HTTP : ' + response.status);
-        }
-        // Sometimes PHP sets Content-Type: application/json even when it outputs HTML (errors).
-        // Detect obvious HTML responses and treat them as non-JSON to avoid JSON.parse on HTML.
-        const trimmed = text.trim();
-        if (trimmed.startsWith('<')) {
-            console.error('Server returned HTML (likely PHP error):', text);
-            throw new Error('Réponse serveur non-JSON (HTML) — voir console pour le détail');
-        }
+                    console.log('Attempting to add to cart for:', product.name);
+                    fetch('api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `action=add&product_name=${encodeURIComponent(product.name)}&price=${parseFloat(product.price.replace(' €', ''))}`,
+                        credentials: 'include' // Add to send session cookies
+                    })
+                    .then(async response => {
+                        console.log('Response received:', response);
+                        const text = await response.text();
+                        const contentType = response.headers.get('content-type') || '';
+                        if (!response.ok) {
+                            console.error('HTTP error', response.status, text);
+                            throw new Error('HTTP Error: ' + response.status);
+                        }
+                        // Sometimes PHP sets Content-Type: application/json even when it outputs HTML (errors).
+                        // Detect obvious HTML responses and treat them as non-JSON to avoid JSON.parse on HTML.
+                        const trimmed = text.trim();
+                        if (trimmed.startsWith('<')) {
+                            console.error('Server returned HTML (likely PHP error):', text);
+                            throw new Error('Server response non-JSON (HTML) — see console for details');
+                        }
 
-        if (contentType.includes('application/json')) {
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON parse failed, server returned:', text);
-                throw e;
-            }
-        } else {
-            console.error('Server returned non-JSON response:', text);
-            throw new Error('Réponse serveur non-JSON (voir console)');
-        }
-    })
-    .then(data => {
-        console.log('Données JSON :', data);
-        if (data.success) {
-            alert(data.message);
-        } else {
-            alert('Erreur : ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur fetch :', error);
-        alert('Erreur réseau : ' + error.message);
-    });
-});
+                        if (contentType.includes('application/json')) {
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('JSON parse failed, server returned:', text);
+                                throw e;
+                            }
+                        } else {
+                            console.error('Server returned non-JSON response:', text);
+                            throw new Error('Server response non-JSON (see console)');
+                        }
+                    })
+                    .then(data => {
+                        console.log('JSON data:', data);
+                        if (data.success) {
+                            alert(data.message);
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                        alert('Network error: ' + error.message);
+                    });
+                });
 
                 gridDiv.appendChild(card);
             });
@@ -230,90 +230,203 @@ if (menuToggle) {
             productsContainer.appendChild(categoryDiv);
         });
 
-        // Connexion
-const loginForm = document.getElementById('login-form');
-const loginMessage = document.getElementById('login-message');
+        // Login
+        const loginForm = document.getElementById('login-form');
+        const loginMessage = document.getElementById('login-message');
 
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(loginForm);
-        fetch('auth.php', {
-            method: 'POST',
-            body: formData,
-            credentials: 'include' // Add to send session cookies
-        })
-        .then(res => res.json())
-        .then(data => {
-            loginMessage.textContent = data.message;
-            loginMessage.style.color = data.success ? 'green' : 'red';
-            if (data.success) {
-                showWelcome();
-            }
-        })
-        .catch(err => {
-            loginMessage.textContent = 'Erreur réseau';
-            loginMessage.style.color = 'red';
-            console.error(err);
-        });
-    });
-}
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(loginForm);
+                fetch('auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include' // Add to send session cookies
+                })
+                .then(res => res.json())
+                .then(data => {
+                    loginMessage.textContent = data.message;
+                    loginMessage.style.color = data.success ? 'green' : 'red';
+                    if (data.success) {
+                        showWelcome();
+                    }
+                })
+                .catch(err => {
+                    loginMessage.textContent = 'Network error';
+                    loginMessage.style.color = 'red';
+                    console.error(err);
+                });
+            });
+        }
 
-// Inscription
-const registerForm = document.getElementById('register-form');
-const registerMessage = document.getElementById('register-message');
+        // Registration
+        const registerForm = document.getElementById('register-form');
+        const registerMessage = document.getElementById('register-message');
 
-if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(registerForm);
-        fetch('auth.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            registerMessage.textContent = data.message;
-            registerMessage.style.color = data.success ? 'green' : 'red';
-            if (data.success) {
-                showWelcome();
-            }
-        })
-        .catch(err => {
-            registerMessage.textContent = 'Erreur réseau';
-            registerMessage.style.color = 'red';
-            console.error(err);
-        });
-    });
-}
+        if (registerForm) {
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(registerForm);
+                fetch('auth.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    registerMessage.textContent = data.message;
+                    registerMessage.style.color = data.success ? 'green' : 'red';
+                    if (data.success) {
+                        showWelcome();
+                    }
+                })
+                .catch(err => {
+                    registerMessage.textContent = 'Network error';
+                    registerMessage.style.color = 'red';
+                    console.error(err);
+                });
+            });
+        }
 
-// Fonction pour afficher le message de bienvenue et masquer les formulaires
-function showWelcome() {
-    const authPage = document.getElementById('auth-page');
-    authPage.innerHTML = `
-        <h2>Bienvenue 👋</h2>
-        <p>Tu es maintenant connecté à Shopping App.</p>
-        <button id="logout-button">Se déconnecter</button>
-    `;
-
-    const logoutButton = document.getElementById('logout-button');
-    logoutButton.addEventListener('click', () => {
-        fetch('auth.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=logout'
-        })
-        .then(res => res.json())
-        .then(data => {
+        // Function to show welcome message and hide forms
+        function showWelcome() {
+            const authPage = document.getElementById('auth-page');
             authPage.innerHTML = `
-                <h2>Inscription / Connexion</h2>
-                <p style="color:green;">${data.message}</p>
-                <p>Recharge la page ou reconnecte-toi pour continuer.</p>
+                <h2>Welcome 👋</h2>
+                <p>You are now logged in to Shopping App.</p>
+                <button id="logout-button">Logout</button>
             `;
+
+            const logoutButton = document.getElementById('logout-button');
+            logoutButton.addEventListener('click', () => {
+                fetch('auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=logout'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    authPage.innerHTML = `
+                        <h2>Registration / Login</h2>
+                        <p style="color:green;">${data.message}</p>
+                        <p>Reload the page or log in again to continue.</p>
+                    `;
+                });
+            });
+        }
+
+        // Load shopping lists
+        function loadLists() {
+            fetch('api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=get',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('lists-body');
+                tbody.innerHTML = '';
+                if (data.success) {
+                    data.lists.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.product_name}</td>
+                            <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)"></td>
+                            <td>${item.price} €</td>
+                            <td><button onclick="removeItem(${item.id})" data-lang="remove">Remove</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4">No list found</td></tr>';
+                }
+            })
+            .catch(error => console.error('Error loading lists:', error));
+        }
+
+        // Update quantity
+        function updateQuantity(id, quantity) {
+            fetch('api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=update&id=${id}&quantity=${quantity}`,
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) alert('Update error');
+            });
+        }
+
+        // Remove item
+        function removeItem(id) {
+            fetch('api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=remove&id=${id}`,
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) loadLists(); // Reload the list
+                else alert('Removal error');
+            });
+        }
+
+        // User profile
+        const userProfile = document.getElementById('user-profile');
+        const userInitial = document.getElementById('user-initial');
+        const profileMenu = document.getElementById('profile-menu');
+
+        if (userProfile) {
+            userProfile.addEventListener('click', () => {
+                profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        document.getElementById('view-lists')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById('lists-page').classList.add('active');
+            loadLists();
         });
-    });
-}
 
+        document.getElementById('view-profile')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Profile to implement');
+        });
 
+        document.getElementById('logout')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetch('auth.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=logout',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+            });
+        });
+
+        // After successful login, show the initial (pass the username from the response)
+        function showUserProfile(username) {
+            if (userProfile) userProfile.style.display = 'inline-block';
+            if (userInitial) userInitial.textContent = username.charAt(0).toUpperCase();
+        }
+
+        // In the login function, after data.success:
+        // showUserProfile(username); // Retrieve the username from DB or store it
+
+        // Load lists when going to the Lists page
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                // ... existing code ...
+                if (pageId === 'lists-page') {
+                    loadLists();
+                }
+            });
+        });
     }
 });

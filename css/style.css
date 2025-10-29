@@ -243,12 +243,12 @@ footer.scrollable {
     right: 0;
 }
 
+/* Footer adjustments for lists page */
+#lists-page footer {
+    position: fixed;
+    bottom: 0;
+}
 
-
-
-
-
-
-
-
-
+#lists-page .page.active {
+    padding-bottom: 4rem; /* Add space at bottom to avoid content overlap with fixed footer */
+}

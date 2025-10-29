@@ -32,7 +32,13 @@ const translations = {
         'Détergent': "Détergent",
         'Papier Toilette': "Papier Toilette",
         'Couteau': "Couteau",
-        'Poêle': "Poêle"
+        'Poêle': "Poêle",
+        profile: "Profil",
+        logout: "Déconnexion",
+        remove: "Supprimer",
+        name: "Nom",
+        quantity: "Quantité",
+        price: "Prix"
     },
     en: {
         welcome: "Welcome to Shopping App",
@@ -66,9 +72,15 @@ const translations = {
         'Détergent': "Detergent",
         'Papier Toilette': "Toilet Paper",
         'Couteau': "Knife",
-        'Poêle': "Pan"
+        'Poêle': "Pan",
+        profile: "Profile",
+        logout: "Logout",
+        remove: "Remove",
+        name: "Name",
+        quantity: "Quantity",
+        price: "Price"
     },
-    es: {  // Español
+    es: {  // Spanish
         welcome: "Bienvenido a Shopping App",
         intro: "Organiza tus compras fácilmente.",
         home: "Inicio",
@@ -100,9 +112,15 @@ const translations = {
         'Détergent': "Detergente",
         'Papier Toilette': "Papel Higiénico",
         'Couteau': "Cuchillo",
-        'Poêle': "Sartén"
+        'Poêle': "Sartén",
+        profile: "Perfil",
+        logout: "Cerrar sesión",
+        remove: "Eliminar",
+        name: "Nombre",
+        quantity: "Cantidad",
+        price: "Precio"
     },
-    de: {  // Deutsch
+    de: {  // German
         welcome: "Willkommen bei Shopping App",
         intro: "Organisiere deine Einkäufe einfach.",
         home: "Startseite",
@@ -134,9 +152,15 @@ const translations = {
         'Détergent': "Waschmittel",
         'Papier Toilette': "Toilettenpapier",
         'Couteau': "Messer",
-        'Poêle': "Pfanne"
+        'Poêle': "Pfanne",
+        profile: "Profil",
+        logout: "Abmelden",
+        remove: "Entfernen",
+        name: "Name",
+        quantity: "Menge",
+        price: "Preis"
     },
-    pt: {  // Português
+    pt: {  // Portuguese
         welcome: "Bem-vindo ao Shopping App",
         intro: "Organize suas compras facilmente.",
         home: "Início",
@@ -168,9 +192,15 @@ const translations = {
         'Détergent': "Detergente",
         'Papier Toilette': "Papel Higiênico",
         'Couteau': "Faca",
-        'Poêle': "Panela"
+        'Poêle': "Panela",
+        profile: "Perfil",
+        logout: "Sair",
+        remove: "Remover",
+        name: "Nome",
+        quantity: "Quantidade",
+        price: "Preço"
     },
-    ko: {  // 한국어
+    ko: {  // Korean
         welcome: "쇼핑 앱에 오신 것을 환영합니다",
         intro: "쇼핑을 쉽게 정리하세요.",
         home: "홈",
@@ -202,7 +232,13 @@ const translations = {
         'Détergent': "세제",
         'Papier Toilette': "화장지",
         'Couteau': "칼",
-        'Poêle': "프라이팬"
+        'Poêle': "프라이팬",
+        profile: "프로필",
+        logout: "로그아웃",
+        remove: "제거",
+        name: "이름",
+        quantity: "수량",
+        price: "가격"
     }
 };
 
