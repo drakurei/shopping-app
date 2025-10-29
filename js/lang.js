@@ -7,7 +7,11 @@ const translations = {
         products: "Produits",
         lists: "Liste de courses",
         contact: "Contact",
-        auth: "Inscription/Connexion",
+        auth: "Inscription / Connexion",       // Auth page main title
+        signupTitle: "Inscription",            // Registration section title
+        loginTitle: "Connexion",               // Login section title
+        signup: "S'inscrire",                  // Registration button
+        login: "Se connecter",                 // Login button
         toggleTheme: "Thème",
         footer: "© 2025 Shopping App.",
         cgv: "CGV",
@@ -21,10 +25,10 @@ const translations = {
         'Outils de Cuisine': "Outils de Cuisine",
         'Pomme': "Pomme",
         'Banane': "Banane",
-        'Tomate': "Tomate",  // Ajouté
-        'Brocoli': "Brocoli",  // Ajouté
-        'Carotte': "Carotte",  // Ajouté
-        'Courgette': "Courgette",  // Ajouté
+        'Tomate': "Tomate",
+        'Brocoli': "Brocoli",
+        'Carotte': "Carotte",
+        'Courgette': "Courgette",
         'Poulet': "Poulet",
         'Boeuf': "Boeuf",
         'Lait': "Lait",
@@ -43,8 +47,8 @@ const translations = {
         name: "Nom",
         quantity: "Quantité",
         price: "Prix",
-        actions: "Actions",  // Ajouté
-        noItems: "Aucun article dans la liste"  // Ajouté
+        actions: "Actions",
+        noItems: "Aucun article dans la liste"
     },
     en: {
         welcome: "Welcome to Shopping App",
@@ -53,7 +57,11 @@ const translations = {
         products: "Products",
         lists: "Shopping Lists",
         contact: "Contact",
-        auth: "Sign Up/Login",
+        auth: "Sign Up / Login",               // Auth page main title
+        signupTitle: "Sign Up",                 // Registration section title
+        loginTitle: "Login",                    // Login section title
+        signup: "Sign Up",                      // Registration button
+        login: "Login",                         // Login button
         toggleTheme: "Theme",
         footer: "© 2025 Shopping App.",
         cgv: "Terms",
@@ -67,10 +75,10 @@ const translations = {
         'Outils de Cuisine': "Kitchen Tools",
         'Pomme': "Apple",
         'Banane': "Banana",
-        'Tomate': "Tomato",  // Ajouté
-        'Brocoli': "Broccoli",  // Ajouté
-        'Carotte': "Carrot",  // Ajouté
-        'Courgette': "Zucchini",  // Ajouté
+        'Tomate': "Tomato",
+        'Brocoli': "Broccoli",
+        'Carotte': "Carrot",
+        'Courgette': "Zucchini",
         'Poulet': "Chicken",
         'Boeuf': "Beef",
         'Lait': "Milk",
@@ -89,8 +97,8 @@ const translations = {
         name: "Name",
         quantity: "Quantity",
         price: "Price",
-        actions: "Actions",  // Ajouté
-        noItems: "No items in list"  // Ajouté
+        actions: "Actions",
+        noItems: "No items in list"
     },
     es: {  // Spanish
         welcome: "Bienvenido a Shopping App",
@@ -191,7 +199,7 @@ const translations = {
         products: "Produtos",
         lists: "Lista de compras",
         contact: "Contato",
-        auth: "Cadastro/Login",
+        auth: "Cadastro/Entrar",
         toggleTheme: "Tema",
         footer: "© 2025 Shopping App.",
         cgv: "Termos",
@@ -278,6 +286,7 @@ const translations = {
     }
 };
 
+// Current language from localStorage or default to French
 let currentLang = localStorage.getItem('lang') || 'fr';
 
 /**
@@ -308,7 +317,7 @@ function updateUI() {
     });
     // Also update products if on products page
     if (document.getElementById('products-page').classList.contains('active')) {
-        loadProducts();
+        loadProducts(); // Your existing function to reload product names with correct language
     }
 }
 
