@@ -19,7 +19,6 @@ body {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    filter: blur(2px);
 }
 
 
@@ -96,6 +95,25 @@ nav a:hover {
 
 .lang-selector:hover {
     background-color: #3d566e;
+}
+
+
+/* Hero language selector */
+
+#hero-lang-selector {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#hero-lang-selector:hover {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: #3498db;
 }
 
 .theme-toggle-btn {

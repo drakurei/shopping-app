@@ -17,9 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateToggleButton(newTheme);
+
+        // Update other theme buttons
+        updateAllThemeButtons(newTheme);
     });
 
     function updateToggleButton(theme) {
         themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    function updateAllThemeButtons(theme) {
+        // Update header theme button
+        const headerThemeBtn = document.getElementById('theme-toggle');
+        if (headerThemeBtn) {
+            headerThemeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Update hero theme button
+        const heroThemeBtn = document.getElementById('hero-theme-toggle');
+        if (heroThemeBtn) {
+            heroThemeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
     }
 });

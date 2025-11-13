@@ -26,28 +26,52 @@ class ShoppingApp {
     bindEvents() {
         // Navigation
         const navHome = document.getElementById('nav-home');
-        if (navHome) navHome.addEventListener('click', () => this.showSection('home-section'));
+        if (navHome) navHome.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('home-section');
+        });
 
         const navHomeAlt = document.getElementById('nav-home-alt');
-        if (navHomeAlt) navHomeAlt.addEventListener('click', () => this.showSection('home-section'));
+        if (navHomeAlt) navHomeAlt.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('home-section');
+        });
 
         const navProducts = document.getElementById('nav-products');
-        if (navProducts) navProducts.addEventListener('click', () => this.showSection('products-section'));
+        if (navProducts) navProducts.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('products-section');
+        });
 
         const navLogin = document.getElementById('nav-login');
-        if (navLogin) navLogin.addEventListener('click', () => this.showSection('login-section'));
+        if (navLogin) navLogin.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('login-section');
+        });
 
         const navRegister = document.getElementById('nav-register');
-        if (navRegister) navRegister.addEventListener('click', () => this.showSection('register-section'));
+        if (navRegister) navRegister.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('register-section');
+        });
 
         const navLists = document.getElementById('nav-lists');
-        if (navLists) navLists.addEventListener('click', () => this.showSection('lists-section'));
+        if (navLists) navLists.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('lists-section');
+        });
 
         const navCart = document.getElementById('nav-cart');
-        if (navCart) navCart.addEventListener('click', () => this.showSection('cart-section'));
+        if (navCart) navCart.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('cart-section');
+        });
 
         const navLogout = document.getElementById('nav-logout');
-        if (navLogout) navLogout.addEventListener('click', this.logout.bind(this));
+        if (navLogout) navLogout.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.logout();
+        });
 
         // Auth buttons
         const loginBtn = document.getElementById('login-btn');
@@ -63,6 +87,9 @@ class ShoppingApp {
         const langSelector = document.getElementById('lang-selector');
         if (langSelector) langSelector.addEventListener('change', (e) => setLanguage(e.target.value));
 
+        const heroLangSelector = document.getElementById('hero-lang-selector');
+        if (heroLangSelector) heroLangSelector.addEventListener('change', (e) => setLanguage(e.target.value));
+
         // Theme toggle
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) themeToggle.addEventListener('click', this.toggleTheme.bind(this));
@@ -72,10 +99,16 @@ class ShoppingApp {
 
         // Form switches
         const switchToRegister = document.getElementById('switch-to-register');
-        if (switchToRegister) switchToRegister.addEventListener('click', () => this.showSection('register-section'));
+        if (switchToRegister) switchToRegister.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('register-section');
+        });
 
         const switchToLogin = document.getElementById('switch-to-login');
-        if (switchToLogin) switchToLogin.addEventListener('click', () => this.showSection('login-section'));
+        if (switchToLogin) switchToLogin.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.showSection('login-section');
+        });
 
         // Forms
         const loginForm = document.getElementById('login-form');
@@ -169,10 +202,14 @@ class ShoppingApp {
      * @param {boolean} loggedIn - Whether user is logged in.
      */
     updateNav(loggedIn) {
-        const loggedInNav = document.querySelectorAll('#nav-lists, #nav-cart, #nav-logout');
+        const loggedInNav = document.querySelectorAll('#nav-lists, #nav-logout');
         const loggedOutNav = document.querySelectorAll('#nav-login, #nav-register');
         loggedInNav.forEach(el => el.style.display = loggedIn ? 'block' : 'none');
         loggedOutNav.forEach(el => el.style.display = loggedIn ? 'none' : 'block');
+
+        // Cart is always visible
+        const cartNav = document.getElementById('nav-cart');
+        if (cartNav) cartNav.style.display = 'block';
     }
 
     /**
@@ -448,12 +485,17 @@ class ShoppingApp {
      * Updates the cart counter.
      */
     async updateCartCounter() {
+        if (!this.currentUser) {
+            updateCartCounter(0);
+            return;
+        }
         try {
             const response = await fetch(LANG.API_BASE + LANG.API_PANIER);
             const data = await response.json();
             updateCartCounter(data.total_count || 0);
         } catch (error) {
             console.error('Counter update failed:', error);
+            updateCartCounter(0);
         }
     }
 
@@ -471,37 +513,47 @@ class ShoppingApp {
      */
     loadStoredData() {
         // Load theme preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.classList.add(savedTheme);
-            this.updateThemeButton(savedTheme === 'dark-theme');
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        this.updateThemeButton(savedTheme === 'dark');
+
+        // Update floating theme button
+        const floatingThemeBtn = document.getElementById('floating-theme-toggle');
+        if (floatingThemeBtn) {
+            floatingThemeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
         }
 
         // Initialize language
-        initLanguage();
+        if (typeof initLanguage === 'function') {
+            initLanguage();
+        }
 
         // Load products if on products page
-        if (document.getElementById('products-section').classList.contains('active')) {
+        if (document.getElementById('products-section') && document.getElementById('products-section').classList.contains('active')) {
             this.loadProducts();
         }
+
+        // Update cart counter
+        this.updateCartCounter();
     }
 
     /**
      * Toggles between light and dark themes.
      */
     toggleTheme() {
-        const body = document.body;
-        const isDark = body.classList.contains('dark-theme');
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-        if (isDark) {
-            body.classList.remove('dark-theme');
-            localStorage.setItem('theme', '');
-        } else {
-            body.classList.add('dark-theme');
-            localStorage.setItem('theme', 'dark-theme');
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+
+        this.updateThemeButton(newTheme === 'dark');
+
+        // Update floating theme button
+        const floatingThemeBtn = document.getElementById('floating-theme-toggle');
+        if (floatingThemeBtn) {
+            floatingThemeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
-
-        this.updateThemeButton(!isDark);
     }
 
     /**
@@ -602,6 +654,11 @@ class ShoppingApp {
      * @param {string} productId - The product ID.
      */
     async addToCart(productId) {
+        if (!this.currentUser) {
+            showMessage('Please login to add items to cart.');
+            this.showSection('login-section');
+            return;
+        }
         try {
             const response = await fetch(LANG.API_BASE + LANG.API_PANIER, {
                 method: 'POST',
@@ -624,13 +681,19 @@ class ShoppingApp {
      * Loads cart items.
      */
     async loadCart() {
+        if (!this.currentUser) {
+            this.cart = [];
+            this.renderCart();
+            return;
+        }
         try {
             const response = await fetch(LANG.API_BASE + LANG.API_PANIER);
             const data = await response.json();
             this.cart = data.cart || [];
             this.renderCart();
         } catch (error) {
-            showMessage(LANG.ERROR);
+            this.cart = [];
+            this.renderCart();
         }
     }
 
@@ -642,7 +705,7 @@ class ShoppingApp {
         container.innerHTML = '';
 
         if (this.cart.length === 0) {
-            container.innerHTML = '<p>Your cart is empty.</p>';
+            container.innerHTML = '<p data-lang="SHOPPING_CART">Your cart is empty.</p>';
             document.getElementById('cart-total-items').textContent = '0';
             document.getElementById('cart-total-price').textContent = '0.00';
             return;
@@ -659,13 +722,13 @@ class ShoppingApp {
                 <div class="cart-item-info">
                     <h4>${item.name}</h4>
                     <p>$${item.price} x ${item.quantity}</p>
-                    <p>Subtotal: $${(item.price * item.quantity).toFixed(2)}</p>
+                    <p data-lang="TOTAL_PRICE">Subtotal: $${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                 <div class="cart-item-controls">
                     <button onclick="app.updateCartItem('${item.id}', ${item.quantity - 1})">-</button>
                     <span>${item.quantity}</span>
                     <button onclick="app.updateCartItem('${item.id}', ${item.quantity + 1})">+</button>
-                    <button onclick="app.removeFromCart('${item.id}')" class="btn btn-secondary">Remove</button>
+                    <button onclick="app.removeFromCart('${item.id}')" class="btn btn-secondary" data-lang="REMOVE">Remove</button>
                 </div>
             `;
             container.appendChild(itemEl);

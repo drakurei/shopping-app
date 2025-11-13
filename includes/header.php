@@ -6,22 +6,22 @@ $isLoggedIn = isLoggedIn();
 ?>
 <header>
     <div class="header-container">
-        <h1 id="app-title">Shopping App</h1>
+        <h1 id="app-title" data-lang="WELCOME">Shopping App</h1>
         <nav>
             <ul class="nav-menu">
-                <li><a href="#" id="nav-home">Home</a></li>
-                <li><a href="#" id="nav-products">Products</a></li>
+                <li><a href="#" id="nav-home" data-lang="HOME">Home</a></li>
+                <li><a href="#" id="nav-products" data-lang="SHOP_PRODUCTS">Products</a></li>
+                <li><a href="#" id="nav-cart" data-lang="SHOPPING_CART">🛒 Cart <span id="total-count">0</span></a></li>
                 <?php if ($isLoggedIn): ?>
-                    <li><a href="#" id="nav-lists">My Lists</a></li>
-                    <li><a href="#" id="nav-cart">Cart <span id="total-count">0</span></a></li>
-                    <li><a href="#" id="nav-logout">Logout</a></li>
+                    <li><a href="#" id="nav-lists" data-lang="MY_LISTS">My Lists</a></li>
+                    <li><a href="#" id="nav-logout" data-lang="LOGOUT">Logout</a></li>
                 <?php else: ?>
-                    <li><a href="#" id="nav-login">Login</a></li>
-                    <li><a href="#" id="nav-register">Register</a></li>
+                    <li><a href="#" id="nav-login" data-lang="LOGIN">Login</a></li>
+                    <li><a href="#" id="nav-register" data-lang="REGISTER">Register</a></li>
                 <?php endif; ?>
             </ul>
             <div class="nav-home-link">
-                <a href="#" id="nav-home-alt" class="btn btn-secondary">Home</a>
+                <a href="#" id="nav-home-alt" class="btn btn-secondary" data-lang="HOME">Home</a>
             </div>
         </nav>
         <div class="header-controls">
@@ -33,7 +33,7 @@ $isLoggedIn = isLoggedIn();
                 <option value="de">DE</option>
                 <option value="ko">KO</option>
             </select>
-            <button id="theme-toggle" class="theme-toggle-btn">🌙</button>
+            <button id="theme-toggle" class="theme-toggle-btn" data-lang="THEME_TOGGLE">🌙</button>
         </div>
     </div>
 </header>

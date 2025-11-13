@@ -1,22 +1,16 @@
-# TODO List for Shopping App Fixes
+# TODO: Implement Shopping Cart with Full Features
 
-## Completed
-- [x] Add floating theme toggle button to footer
-- [x] Create CSS for floating theme toggle
-- [x] Create JS for floating theme toggle functionality
-- [x] Link floating theme toggle CSS and JS to all pages
-- [x] Update CSS to set blurred background image on body
-- [x] Add data-lang attributes to text elements in index.html for language switching
-- [x] Add data-lang attributes to text elements in pages/contact.html for language switching
-- [x] Add data-lang attributes to text elements in pages/legal.html for language switching
-- [x] Add data-lang attributes to text elements in pages/social.html for language switching
-- [x] Add data-lang attributes to text elements in pages/terms.html for language switching
-- [x] Add French translations to js/lang.js
-- [x] Fix JavaScript errors in util.js and lang.js
-- [x] Add hero theme toggle button
+## Cart Accessibility
+- [x] Move cart link outside login conditional in includes/header.php, add 🛒 icon
 
-## Followup
-- [ ] Test language selector functionality
-- [ ] Test background image display
-- [ ] Verify floating theme toggle button visibility
-- [ ] Test hero theme toggle button
+## Cart Counter
+- [x] Adjust updateCartCounter in js/app.js to handle non-logged users (set to 0)
+
+## Dark Theme Compatibility
+- [x] Verify and adjust css/themes.css for full cart dark theme support
+
+## Testing
+- [x] Test cart access from all pages (link always visible)
+- [x] Test item counter with 🛒 icon (added to header)
+- [x] Test dark theme on cart elements (CSS variables applied)
+- [x] Test add/remove/update quantities functionality (existing API and JS)

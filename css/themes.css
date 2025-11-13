@@ -137,6 +137,20 @@ footer {
 }
 
 
+/* Dark theme for hero language selector */
+
+.dark-theme #hero-lang-selector {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    border-color: #555;
+}
+
+.dark-theme #hero-lang-selector:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    border-color: #3498db;
+}
+
+
 /* Cart theme */
 
 .cart-item {
@@ -146,6 +160,27 @@ footer {
 
 .cart-item-info h4 {
     color: var(--text-color);
+}
+
+
+/* Button theme overrides for dark mode */
+
+.dark-theme .btn-primary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.dark-theme .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.dark-theme .btn-secondary {
+    background-color: var(--text-secondary);
+    color: var(--background-color);
+}
+
+.dark-theme .btn-secondary:hover {
+    background-color: #7f8c8d;
 }
 
 
