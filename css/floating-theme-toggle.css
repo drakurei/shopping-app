@@ -1,0 +1,42 @@
+/* Floating theme toggle button */
+
+.floating-theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #3498db;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-theme-toggle:hover {
+    background-color: #2980b9;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.floating-theme-toggle:active {
+    transform: scale(0.95);
+}
+
+
+/* Dark theme adjustments for floating button */
+
+.dark-theme .floating-theme-toggle {
+    background-color: #34495e;
+}
+
+.dark-theme .floating-theme-toggle:hover {
+    background-color: #2c3e50;
+}

@@ -1,54 +1,80 @@
 <?php
-// api_auth.php - API for user authentication (login/register)
-// Requires PDO for database connection
+// php/api_auth.php - Authentication API endpoints
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // For development, adjust for production
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once '../config.php';
+require_once '../auth.php';
+require_once '../api.php';
 
-// Database connection
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=shopping_app_db;charset=utf8', 'root', '');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo json_encode(['error' => 'Database connection failed']);
+// Handle preflight OPTIONS request for CORS
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+// Set CORS headers
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-    $password = $data['password'];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    sendJsonResponse(['error' => 'Method not allowed'], 405);
+}
 
-    if (isset($data['register'])) {
-        // Register new user
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['error' => 'Invalid email']);
-            exit;
-        }
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        try {
-            $stmt = $pdo->prepare("INSERT INTO users (email, password_hash) VALUES (?, ?)");
-            $stmt->execute([$email, $hashedPassword]);
-            echo json_encode(['success' => true, 'message' => 'User registered']);
-        } catch (PDOException $e) {
-            echo json_encode(['error' => 'Email already exists']);
-        }
-    } else {
-        // Login
-        $stmt = $pdo->prepare("SELECT id, email, password_hash FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($user && password_verify($password, $user['password_hash'])) {
-            // Start session or return token (for simplicity, return user data)
-            echo json_encode(['success' => true, 'user' => ['id' => $user['id'], 'email' => $user['email']]]);
-        } else {
-            echo json_encode(['error' => 'Invalid credentials']);
-        }
+$input = getJsonInput();
+if (!$input) {
+    sendJsonResponse(['error' => 'Invalid JSON input'], 400);
+}
+
+$action = $input['action'] ?? '';
+
+try {
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    if ($conn->connect_error) {
+        throw new Exception('Database connection failed: ' . $conn->connect_error);
     }
-} else {
-    echo json_encode(['error' => 'Method not allowed']);
+    $conn->set_charset('utf8');
+
+    switch ($action) {
+        case 'register':
+            $username = sanitizeInput($input['username'] ?? '');
+            $email = sanitizeInput($input['email'] ?? '');
+            $password = $input['password'] ?? '';
+
+            $result = registerUser($username, $email, $password);
+            $status = $result['success'] ? 201 : 400;
+            sendJsonResponse($result, $status);
+            break;
+
+        case 'login':
+            $identifier = sanitizeInput($input['identifier'] ?? '');
+            $password = $input['password'] ?? '';
+
+            $result = loginUser($identifier, $password);
+            if ($result['success']) {
+                $result['csrf_token'] = generateCsrfToken();
+            }
+            $status = $result['success'] ? 200 : 401;
+            sendJsonResponse($result, $status);
+            break;
+
+        case 'logout':
+            $result = logoutUser();
+            sendJsonResponse($result, 200);
+            break;
+
+        case 'validate':
+            $result = validateSession();
+            sendJsonResponse($result, $result['valid'] ? 200 : 401);
+            break;
+
+        default:
+            sendJsonResponse(['error' => 'Invalid action'], 400);
+    }
+} catch (Exception $e) {
+    logApiError('Auth API error: ' . $e->getMessage());
+    sendJsonResponse(['error' => 'Database error'], 500);
 }
 ?>

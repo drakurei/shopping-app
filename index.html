@@ -1,131 +1,187 @@
-<!-- index.html - Main entry point for the shopping app SPA -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping App</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/themes.css">
-    <!-- Google Fonts for better typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/floating-theme-toggle.css">
 </head>
+
 <body>
-    <!-- Navigation without band, positioned absolutely on the image -->
-    <nav class="navbar">
-        <button id="menu-toggle" class="menu-toggle">☰</button>
-        <div class="logo">Shopping App</div>
-        <ul class="nav-links" id="nav-links">
-            <li><a href="#" data-page="home" data-lang="home">Accueil</a></li>
-            <li><a href="#" data-page="products" data-lang="products">Produits</a></li>
-            <li><a href="#" data-page="lists" data-lang="lists">Liste de courses</a></li>
-            <li><a href="#" data-page="contact" data-lang="contact">Contact</a></li>
-            <li><a href="#" data-page="auth" data-lang="auth">Inscription/Connexion</a></li>
-            <!-- Mobile controls: theme and languages in column in hamburger -->
-            <li class="nav-controls-mobile">
-                <button id="theme-toggle-mobile" data-lang="toggle-theme">🌙</button>
-                <select id="lang-select-mobile">
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="de">Deutsch</option>
-                    <option value="pt">Português</option>
-                    <option value="ko">한국어</option>
-                </select>
-            </li>
-        </ul>
-        <!-- PC controls: visible at top right -->
-        <div class="nav-controls">
-            <button id="theme-toggle" data-lang="toggle-theme">🌙</button>
-            <div id="user-profile" style="display: none;">
-                <span id="user-initial"></span>
-                <div id="profile-menu" style="display: none;">
-                    <a href="#" id="view-lists" data-lang="lists">Mes listes</a>
-                    <a href="#" id="view-profile" data-lang="profile">Profil</a>
-                    <a href="#" id="logout" data-lang="logout">Déconnexion</a>
+    <?php include 'includes/header.php'; ?>
+    <main>
+        <!-- Home Section -->
+        <section id="home-section" class="section active">
+            <div class="hero">
+                <h2 data-lang="WELCOME">Welcome to Shopping App</h2>
+                <p data-lang="WELCOME_DESC">Manage your shopping lists efficiently and shop smarter.</p>
+                <div class="hero-buttons">
+                    <button id="login-btn" class="btn btn-primary" data-lang="LOGIN">Login</button>
+                    <button id="register-btn" class="btn btn-secondary" data-lang="REGISTER">Register</button>
+                    <button id="shop-btn" class="btn btn-secondary" data-lang="SHOP_NOW">Shop Now</button>
+                    <button id="hero-theme-toggle" class="btn btn-secondary" data-lang="THEME_TOGGLE">🌙 Theme</button>
                 </div>
             </div>
-            <select id="lang-select">
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-                <option value="pt">Português</option>
-                <option value="ko">한국어</option>
-            </select>
-        </div>
-    </nav>
-
-    <!-- Dynamic SPA content -->
-    <main id="app">
-        <section id="home-page" class="page active">
-            <h1 data-lang="welcome">Bienvenue sur Shopping App</h1>
-            <p data-lang="intro">Organisez vos courses facilement.</p>
-        </section>
-        <!-- Products page -->
-        <section id="products-page" class="page">
-            <h1 data-lang="products">Produits</h1>
-            <div id="products-container">
-                <!-- Products will be loaded here via JS -->
+            <div class="features">
+                <div class="feature">
+                    <img src="assets/apple.jpg" alt="Apple" class="feature-img">
+                    <h3 data-lang="FRESH_PRODUCE">Fresh Produce</h3>
+                    <p data-lang="FRESH_PRODUCE_DESC">Find the best fruits and vegetables for your meals.</p>
+                </div>
+                <div class="feature">
+                    <img src="assets/milk.jpg" alt="Milk" class="feature-img">
+                    <h3 data-lang="DAIRY_PRODUCTS">Dairy Products</h3>
+                    <p data-lang="DAIRY_PRODUCTS_DESC">Quality dairy items for your daily needs.</p>
+                </div>
+                <div class="feature">
+                    <img src="assets/chicken.jpg" alt="Chicken" class="feature-img">
+                    <h3 data-lang="MEAT_POULTRY">Meat & Poultry</h3>
+                    <p data-lang="MEAT_POULTRY_DESC">Fresh meat options for delicious meals.</p>
+                </div>
             </div>
         </section>
-        
-        <!-- Lists page -->
-       <section id="lists-page" class="page">
-    <h1 data-lang="lists">Liste de courses</h1>
-    <div id="lists-container">
-        <table id="lists-table">
-            <thead>
-                <tr>
-                    <th data-lang="name">Nom</th>
-                    <th data-lang="quantity">Quantité</th>
-                    <th data-lang="price">Prix</th>
-                    <th data-lang="actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="lists-body">
-                <!-- Les lignes seront ajoutées dynamiquement -->
-            </tbody>
-        </table>
-    </div>
-</section>
+        <!-- Login Section -->
+        <section id="login-section" class="section hidden">
+            <div class="form-container">
+                <h2 data-lang="LOGIN">Login</h2>
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-identifier" data-lang="USERNAME_EMAIL">Username or Email:</label>
+                        <input type="text" id="login-identifier" name="identifier" required>
+                        <span class="helper" data-lang="ENTER_USERNAME_EMAIL">Enter your username or email.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" data-lang="PASSWORD">Password:</label>
+                        <input type="password" id="login-password" name="password" required>
+                        <span class="helper" data-lang="ENTER_PASSWORD">Enter your password.</span>
+                    </div>
+                    <button type="submit" id="login-submit-btn" class="btn btn-primary" disabled data-lang="LOGIN">Login</button>
+                </form>
+                <p data-lang="NO_ACCOUNT">Don't have an account? <a href="#" id="switch-to-register" data-lang="REGISTER_HERE">Register here</a></p>
+            </div>
+        </section>
+
+        <!-- Register Section -->
+        <section id="register-section" class="section hidden">
+            <div class="form-container">
+                <h2 data-lang="REGISTER">Register</h2>
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-username" data-lang="USERNAME">Username:</label>
+                        <input type="text" id="register-username" name="username" required minlength="3">
+                        <span class="helper" data-lang="CHOOSE_USERNAME">Choose a unique username.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email" data-lang="EMAIL">Email:</label>
+                        <input type="email" id="register-email" name="email" required>
+                        <span class="helper" data-lang="ENTER_EMAIL">Enter a valid email address.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password" data-lang="PASSWORD">Password:</label>
+                        <input type="password" id="register-password" name="password" required minlength="8">
+                        <span class="helper" data-lang="PASSWORD_MIN">Password must be at least 8 characters.</span>
+                    </div>
+                    <button type="submit" id="register-submit-btn" class="btn btn-primary" disabled data-lang="REGISTER">Register</button>
+                </form>
+                <p data-lang="HAVE_ACCOUNT">Already have an account? <a href="#" id="switch-to-login" data-lang="LOGIN_HERE">Login here</a></p>
+            </div>
+        </section>
+        <!-- Lists Section -->
+        <section id="lists-section" class="section hidden">
+            <div class="lists-container">
+                <div class="section-nav">
+                    <button id="lists-home-btn" class="btn btn-secondary" data-lang="HOME">Home</button>
+                    <button id="lists-logout-btn" class="btn btn-secondary" data-lang="LOGOUT">Logout</button>
+                </div>
+                <h2 data-lang="MY_LISTS">My Shopping Lists</h2>
+                <button id="create-list-btn" class="btn btn-primary" data-lang="CREATE_LIST">Create New List</button>
+                <div id="lists-container" class="lists-grid">
+                    <!-- Lists will be rendered here -->
+                </div>
+                <!-- Quick Add Form -->
+                <div class="quick-add-form" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+                    <h3 data-lang="QUICK_ADD">Quick Add Item</h3>
+                    <form id="quick-add-form" style="display: flex; gap: 10px; align-items: end; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 150px;">
+                            <label for="quick-item-name" style="display: block; margin-bottom: 5px;" data-lang="ITEM_NAME">Item Name:</label>
+                            <input type="text" id="quick-item-name" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <label for="quick-item-category" style="display: block; margin-bottom: 5px;" data-lang="CATEGORY">Category:</label>
+                            <input type="text" id="quick-item-category" placeholder="Optional" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 0.5; min-width: 80px;">
+                            <label for="quick-item-quantity" style="display: block; margin-bottom: 5px;" data-lang="QUANTITY">Quantity:</label>
+                            <input type="number" id="quick-item-quantity" value="1" min="1" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1; min-width: 120px;">
+                            <label for="quick-list-select" style="display: block; margin-bottom: 5px;" data-lang="ADD_TO_LIST">Add to List:</label>
+                            <select id="quick-list-select" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                <option value="" data-lang="SELECT_LIST">Select a list...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="padding: 8px 16px; white-space: nowrap;" data-lang="ADD_ITEM">Add Item</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products-section" class="section hidden">
+            <div class="products-container">
+                <div class="products-header">
+                    <div class="products-nav">
+                        <button id="products-home-btn" class="btn btn-secondary" data-lang="HOME">Home</button>
+                        <h2 data-lang="SHOP_PRODUCTS">Shop Products</h2>
+                    </div>
+                    <div class="products-controls">
+                        <input type="text" id="search-input" data-lang-placeholder="SEARCH_PLACEHOLDER" placeholder="Search products...">
+                        <select id="category-filter">
+                            <option value="" data-lang="ALL_CATEGORIES">All Categories</option>
+                            <option value="Fruits" data-lang="FRUITS">Fruits</option>
+                            <option value="Dairy" data-lang="DAIRY">Dairy</option>
+                            <option value="Meat" data-lang="MEAT">Meat</option>
+                            <option value="Bakery" data-lang="BAKERY">Bakery</option>
+                            <option value="Beverages" data-lang="BEVERAGES">Beverages</option>
+                        </select>
+                        <button id="clear-filters-btn" class="btn btn-secondary" data-lang="CLEAR_FILTERS">Clear Filters</button>
+                    </div>
+                </div>
+                <div id="products-grid" class="products-grid">
+                    <!-- Products will be rendered here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart-section" class="section hidden">
+            <div class="cart-container">
+                <div class="cart-header">
+                    <h2 data-lang="SHOPPING_CART">Shopping Cart</h2>
+                    <button id="continue-shopping-btn" class="btn btn-secondary" data-lang="CONTINUE_SHOPPING">Continue Shopping</button>
+                </div>
+                <div id="cart-items" class="cart-items">
+                    <!-- Cart items will be rendered here -->
+                </div>
+                <div class="cart-summary">
+                    <div class="cart-totals">
+                        <p data-lang="TOTAL_ITEMS">Total Items: <span id="cart-total-items">0</span></p>
+                        <p data-lang="TOTAL_PRICE">Total Price: $<span id="cart-total-price">0.00</span></p>
+                    </div>
+                    <button id="checkout-btn" class="btn btn-primary" data-lang="PROCEED_TO_CHECKOUT">Proceed to Checkout</button>
+                </div>
+            </div>
+        </section>
     </main>
-
-   <!-- Auth page -->
-<section id="auth-page" class="page">
-  <!-- Page title -->
-  <h1 data-lang="auth">Inscription / Connexion</h1>
-
-  <!-- Registration section -->
-  <h2 data-lang="signupTitle">Inscription</h2>
-  <form id="register-form">
-    <input type="hidden" name="action" value="register">
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <!-- Button with data-lang for translation -->
-    <button type="submit" data-lang="signup">S'inscrire</button>
-  </form>
-  <p id="register-message"></p>
-
-  <!-- Login section -->
-  <h2 data-lang="loginTitle">Connexion</h2>
-  <form id="login-form">
-    <input type="hidden" name="action" value="login">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <!-- Button with data-lang for translation -->
-    <button type="submit" data-lang="login">Se connecter</button>
-  </form>
-  <p id="login-message"></p>
-</section>
-
-    <!-- Footer stuck at bottom -->
-    <footer>
-        <p data-lang="footer">© 2025 Shopping App. <a href="#" data-lang="cgv">CGV</a> | <a href="#" data-lang="legal">Mentions légales</a></p>
-    </footer>
-
+    <?php include 'includes/footer.php'; ?>
     <script src="js/lang.js"></script>
+    <script src="js/util.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/quick-add.js"></script>
+    <script src="js/floating-theme-toggle.js"></script>
 </body>
+
 </html>

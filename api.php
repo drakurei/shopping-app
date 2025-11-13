@@ -1,124 +1,73 @@
 <?php
-// Enable all error reporting for debugging
-error_reporting(E_ALL);
-// Do not display PHP errors directly in responses. Convert errors/exceptions to JSON responses.
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-session_start();
-
-// Log session for debugging (kept) — won't leak to client
-file_put_contents('debug_session.txt', print_r($_SESSION, true));
+// api.php - General API utilities
 
 require_once 'config.php';
-require_once 'session.php';
 
-// Global error/exception handlers to return JSON instead of HTML
-set_error_handler(function($severity, $message, $file, $line) {
-    http_response_code(500);
-    header('Content-Type: application/json');
-    error_log("PHP error: $message in $file:$line");
-    echo json_encode(['success' => false, 'message' => 'Server error']);
-    exit;
-});
-
-set_exception_handler(function($ex) {
-    http_response_code(500);
-    header('Content-Type: application/json');
-    error_log($ex);
-    echo json_encode(['success' => false, 'message' => 'Server exception']);
-    exit;
-});
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit(0);
-}
-
-header('Content-Type: application/json');
-
-if (!isLoggedIn()) {
-    echo json_encode(['success' => false, 'message' => 'Not logged in']);
+/**
+ * Sends a JSON response with appropriate headers.
+ *
+ * @param mixed $data The data to encode as JSON.
+ * @param int $statusCode The HTTP status code (default 200).
+ * @return void
+ */
+function sendJsonResponse($data, $statusCode = 200) {
+    http_response_code($statusCode);
+    header(JSON_CONTENT_TYPE . '; charset=utf-8');
+    echo json_encode($data);
     exit;
 }
 
-$user_id = getUserId();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'add') {
-        $product_name = $_POST['product_name'];
-        $quantity = $_POST['quantity'] ?? 1;
-        $price = $_POST['price'];
-
-        $stmt = $conn->prepare("INSERT INTO shopping_lists (user_id, product_name, quantity, price) VALUES (?, ?, ?, ?)");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("isid", $user_id, $product_name, $quantity, $price);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Product added']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Add error: ' . $stmt->error]);
-        }
-        $stmt->close();
-    } elseif ($action === 'remove') {
-        $id = $_POST['id'];
-
-        $stmt = $conn->prepare("DELETE FROM shopping_lists WHERE id = ? AND user_id = ?");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("ii", $id, $user_id);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Product removed']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Removal error: ' . $stmt->error]);
-        }
-        $stmt->close();
-    } elseif ($action === 'update') {
-        // Added update action for quantity
-        $id = $_POST['id'];
-        $quantity = $_POST['quantity'];
-
-        $stmt = $conn->prepare("UPDATE shopping_lists SET quantity = ? WHERE id = ? AND user_id = ?");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("iii", $quantity, $id, $user_id);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Quantity updated']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Update error: ' . $stmt->error]);
-        }
-        $stmt->close();
-    } elseif ($action === 'get') {
-        $stmt = $conn->prepare("SELECT id, product_name, quantity, price FROM shopping_lists WHERE user_id = ?");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Preparation error: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $lists = [];
-        while ($row = $result->fetch_assoc()) {
-            $lists[] = $row;
-        }
-        echo json_encode(['success' => true, 'lists' => $lists]);
-        $stmt->close();
-    }
-} else {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+/**
+ * Gets the JSON input from the request body.
+ *
+ * @return array|null The decoded JSON array, or null if invalid.
+ */
+function getJsonInput() {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    return json_last_error() === JSON_ERROR_NONE ? $data : null;
 }
-$conn->close();
+
+/**
+ * Validates CSRF token from session and request.
+ *
+ * @param string $token The token from request.
+ * @return bool True if valid, false otherwise.
+ */
+function validateCsrfToken($token) {
+    session_start();
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Generates a new CSRF token and stores in session.
+ *
+ * @return string The generated token.
+ */
+function generateCsrfToken() {
+    session_start();
+    $token = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = $token;
+    return $token;
+}
+
+/**
+ * Sanitizes input to prevent XSS.
+ *
+ * @param string $input The input string.
+ * @return string The sanitized string.
+ */
+function sanitizeInput($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Logs API errors for debugging.
+ *
+ * @param string $message The error message.
+ * @return void
+ */
+function logApiError($message) {
+    error_log('[API Error] ' . $message);
+}
 ?>

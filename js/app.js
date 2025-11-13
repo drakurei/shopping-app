@@ -1,451 +1,738 @@
-// app.js - Main application logic for SPA and interactions
-document.addEventListener('DOMContentLoaded', () => {
-    // SPA Navigation
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const pages = document.querySelectorAll('.page');
-    const footer = document.querySelector('footer');
+// js/app.js - Main application logic
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pageId = link.getAttribute('data-page') + '-page';
-            pages.forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-
-            // Auth page isolation: remove scroll ONLY here
-            if (pageId === "auth-page") {
-                document.body.style.overflow = "hidden";
-            } else {
-                document.body.style.overflow = "auto";
-            }
-
-            // Toggle footer class based on page
-            if (pageId === 'products-page' || pageId === 'auth-page' || pageId === 'lists-page') {
-                footer.classList.add('scrollable');
-            } else {
-                footer.classList.remove('scrollable');
-            }
-
-            // Close hamburger menu after navigation
-            document.getElementById('nav-links').classList.remove('active');
-        });
-    });
-
-    // Hamburger Menu Toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const navLinksEl = document.getElementById('nav-links');
-
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            if (navLinksEl) navLinksEl.classList.toggle('active');
-        });
+/**
+ * Main application class for the Shopping App SPA.
+ */
+class ShoppingApp {
+    constructor() {
+        this.currentUser = null;
+        this.lists = [];
+        this.cart = [];
+        this.init();
     }
 
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeToggleMobile = document.getElementById('theme-toggle-mobile');
-    const body = document.body;
-
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-theme');
-        themeToggle.textContent = '☀️';
-        themeToggleMobile.textContent = '☀️';
-    } else {
-        themeToggle.textContent = '🌙';
-        themeToggleMobile.textContent = '🌙';
+    /**
+     * Initializes the application.
+     */
+    init() {
+        this.bindEvents();
+        this.checkAuthStatus();
+        this.loadStoredData();
     }
 
-    const toggleTheme = () => {
-        body.classList.toggle('dark-theme');
-        const isDark = body.classList.contains('dark-theme');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        themeToggleMobile.textContent = isDark ? '☀️' : '🌙';
-    };
+    /**
+     * Binds event listeners to UI elements.
+     */
+    bindEvents() {
+        // Navigation
+        const navHome = document.getElementById('nav-home');
+        if (navHome) navHome.addEventListener('click', () => this.showSection('home-section'));
 
-    themeToggle.addEventListener('click', toggleTheme);
-    themeToggleMobile.addEventListener('click', toggleTheme);
+        const navHomeAlt = document.getElementById('nav-home-alt');
+        if (navHomeAlt) navHomeAlt.addEventListener('click', () => this.showSection('home-section'));
 
-    // Language Switch
-    const langSelect = document.getElementById('lang-select');
-    const langSelectMobile = document.getElementById('lang-select-mobile');
+        const navProducts = document.getElementById('nav-products');
+        if (navProducts) navProducts.addEventListener('click', () => this.showSection('products-section'));
 
-    const savedLang = localStorage.getItem('lang') || 'fr';
-    langSelect.value = savedLang;
-    langSelectMobile.value = savedLang;
-    updateLanguage(savedLang);
+        const navLogin = document.getElementById('nav-login');
+        if (navLogin) navLogin.addEventListener('click', () => this.showSection('login-section'));
 
-    const changeLanguage = (lang) => {
-        localStorage.setItem('lang', lang);
-        updateLanguage(lang);
-    };
+        const navRegister = document.getElementById('nav-register');
+        if (navRegister) navRegister.addEventListener('click', () => this.showSection('register-section'));
 
-    langSelect.addEventListener('change', (e) => changeLanguage(e.target.value));
-    langSelectMobile.addEventListener('change', (e) => changeLanguage(e.target.value));
+        const navLists = document.getElementById('nav-lists');
+        if (navLists) navLists.addEventListener('click', () => this.showSection('lists-section'));
 
-    function updateLanguage(lang) {
-        const elements = document.querySelectorAll('[data-lang]');
-        elements.forEach(el => {
-            const key = el.getAttribute('data-lang');
-            if (translations[lang] && translations[lang][key]) {
-                el.textContent = translations[lang][key];
-            }
-        });
-    }
+        const navCart = document.getElementById('nav-cart');
+        if (navCart) navCart.addEventListener('click', () => this.showSection('cart-section'));
 
-    // Load Products
-    loadProducts();
+        const navLogout = document.getElementById('nav-logout');
+        if (navLogout) navLogout.addEventListener('click', this.logout.bind(this));
 
-    function loadProducts() {
-        const productsContainer = document.getElementById('products-container');
-        const categories = [
-            {
-                name: 'Fruits et Légumes',
-                products: [
-                    { name: 'Pomme', price: '1.50 €', image: 'assets/apple.jpg' },
-                    { name: 'Banane', price: '0.80 €', image: 'assets/banana.jpg' },
-                    { name: 'Tomate', price: '2.00 €', image: 'assets/tomato.jpg' },
-                    { name: 'Brocoli', price: '1.80 €', image: 'assets/broccoli.jpg' },
-                    { name: 'Carotte', price: '1.20 €', image: 'assets/carrot.jpg' },
-                    { name: 'Courgette', price: '1.50 €', image: 'assets/zucchini.jpg' }
-                ]
-            },
-            {
-                name: 'Viandes',
-                products: [
-                    { name: 'Poulet', price: '5.00 €', image: 'assets/chicken.jpg' },
-                    { name: 'Boeuf', price: '7.00 €', image: 'assets/beef.jpg' }
-                ]
-            },
-            {
-                name: 'Produits Laitiers',
-                products: [
-                    { name: 'Lait', price: '1.20 €', image: 'assets/milk.jpg' },
-                    { name: 'Fromage', price: '3.50 €', image: 'assets/cheese.jpg' }
-                ]
-            },
-            {
-                name: 'Poisson',
-                products: [
-                    { name: 'Saumon', price: '8.00 €', image: 'assets/salmon.jpg' },
-                    { name: 'Thon', price: '4.00 €', image: 'assets/tuna.jpg' }
-                ]
-            },
-            {
-                name: 'Boissons',
-                products: [
-                    { name: 'Eau', price: '0.50 €', image: 'assets/water.jpg' },
-                    { name: 'Jus d\'Orange', price: '2.00 €', image: 'assets/orangejuice.jpg' }
-                ]
-            },
-            {
-                name: 'Objets Ménagers',
-                products: [
-                    { name: 'Détergent', price: '2.50 €', image: 'assets/detergent.jpg' },
-                    { name: 'Papier Toilette', price: '1.00 €', image: 'assets/toiletpaper.jpg' }
-                ]
-            },
-            {
-                name: 'Outils de Cuisine',
-                products: [
-                    { name: 'Couteau', price: '10.00 €', image: 'assets/knife.jpg' },
-                    { name: 'Poêle', price: '15.00 €', image: 'assets/pan.jpg' }
-                ]
-            }
-        ];
+        // Auth buttons
+        const loginBtn = document.getElementById('login-btn');
+        if (loginBtn) loginBtn.addEventListener('click', () => this.showSection('login-section'));
 
-        categories.forEach(category => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'category';
-            categoryDiv.innerHTML = `<h2 data-lang="${category.name}">${category.name}</h2>`;
-            const gridDiv = document.createElement('div');
-            gridDiv.className = 'products-grid';
+        const registerBtn = document.getElementById('register-btn');
+        if (registerBtn) registerBtn.addEventListener('click', () => this.showSection('register-section'));
 
-            category.products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}">
-                    <h3 data-lang="${product.name}">${product.name}</h3>
-                    <p data-lang="price">${product.price}</p>
-                    <button data-lang="addToCart">Ajouter au panier</button>
-                `;
+        const shopBtn = document.getElementById('shop-btn');
+        if (shopBtn) shopBtn.addEventListener('click', () => this.showSection('products-section'));
 
-                const button = card.querySelector('button');
-                button.addEventListener('click', () => {
-                    console.log('Attempting to add to cart for:', product.name);
-                    fetch('api.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `action=add&product_name=${encodeURIComponent(product.name)}&price=${parseFloat(product.price.replace(' €', ''))}`,
-                        credentials: 'include' // Add to send session cookies
-                    })
-                    .then(async response => {
-                        console.log('Response received:', response);
-                        const text = await response.text();
-                        const contentType = response.headers.get('content-type') || '';
-                        if (!response.ok) {
-                            console.error('HTTP error', response.status, text);
-                            throw new Error('HTTP Error: ' + response.status);
-                        }
-                        // Sometimes PHP sets Content-Type: application/json even when it outputs HTML (errors).
-                        // Detect obvious HTML responses and treat them as non-JSON to avoid JSON.parse on HTML.
-                        const trimmed = text.trim();
-                        if (trimmed.startsWith('<')) {
-                            console.error('Server returned HTML (likely PHP error):', text);
-                            throw new Error('Server response non-JSON (HTML) — see console for details');
-                        }
+        // Language selector
+        const langSelector = document.getElementById('lang-selector');
+        if (langSelector) langSelector.addEventListener('change', (e) => setLanguage(e.target.value));
 
-                        if (contentType.includes('application/json')) {
-                            try {
-                                return JSON.parse(text);
-                            } catch (e) {
-                                console.error('JSON parse failed, server returned:', text);
-                                throw e;
-                            }
-                        } else {
-                            console.error('Server returned non-JSON response:', text);
-                            throw new Error('Server response non-JSON (see console)');
-                        }
-                    })
-                    .then(data => {
-                        console.log('JSON data:', data);
-                        if (data.success) {
-                            alert(data.message);
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                        alert('Network error: ' + error.message);
-                    });
-                });
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) themeToggle.addEventListener('click', this.toggleTheme.bind(this));
 
-                gridDiv.appendChild(card);
-            });
+        const heroThemeToggle = document.getElementById('hero-theme-toggle');
+        if (heroThemeToggle) heroThemeToggle.addEventListener('click', this.toggleTheme.bind(this));
 
-            categoryDiv.appendChild(gridDiv);
-            productsContainer.appendChild(categoryDiv);
-        });
+        // Form switches
+        const switchToRegister = document.getElementById('switch-to-register');
+        if (switchToRegister) switchToRegister.addEventListener('click', () => this.showSection('register-section'));
 
-        // Login
+        const switchToLogin = document.getElementById('switch-to-login');
+        if (switchToLogin) switchToLogin.addEventListener('click', () => this.showSection('login-section'));
+
+        // Forms
         const loginForm = document.getElementById('login-form');
-        const loginMessage = document.getElementById('login-message');
+        if (loginForm) loginForm.addEventListener('submit', this.handleLogin.bind(this));
 
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(loginForm);
-                fetch('auth.php', {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'include' // Add to send session cookies
-                })
-                .then(res => res.json())
-                .then(data => {
-                    loginMessage.textContent = data.message;
-                    loginMessage.style.color = data.success ? 'green' : 'red';
-                    if (data.success) {
-                        showWelcome();
-                    }
-                })
-                .catch(err => {
-                    loginMessage.textContent = 'Network error';
-                    loginMessage.style.color = 'red';
-                    console.error(err);
-                });
-            });
-        }
-
-        // Registration
         const registerForm = document.getElementById('register-form');
-        const registerMessage = document.getElementById('register-message');
+        if (registerForm) registerForm.addEventListener('submit', this.handleRegister.bind(this));
 
-        if (registerForm) {
-            registerForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(registerForm);
-                fetch('auth.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    registerMessage.textContent = data.message;
-                    registerMessage.style.color = data.success ? 'green' : 'red';
-                    if (data.success) {
-                        showWelcome();
-                    }
-                })
-                .catch(err => {
-                    registerMessage.textContent = 'Network error';
-                    registerMessage.style.color = 'red';
-                    console.error(err);
-                });
-            });
+        // Form validation
+        document.querySelectorAll('input[required]').forEach(input => {
+            input.addEventListener('input', () => this.validateForm(input.form));
+        });
+
+        // Lists
+        const createListBtn = document.getElementById('create-list-btn');
+        if (createListBtn) createListBtn.addEventListener('click', this.createList.bind(this));
+
+        // Section navigation
+        const listsHomeBtn = document.getElementById('lists-home-btn');
+        if (listsHomeBtn) listsHomeBtn.addEventListener('click', () => this.showSection('home-section'));
+
+        const listsLogoutBtn = document.getElementById('lists-logout-btn');
+        if (listsLogoutBtn) listsLogoutBtn.addEventListener('click', this.logout.bind(this));
+
+        // Products
+        const productsHomeBtn = document.getElementById('products-home-btn');
+        if (productsHomeBtn) productsHomeBtn.addEventListener('click', () => this.showSection('home-section'));
+
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) searchInput.addEventListener('input', this.filterProducts.bind(this));
+
+        const categoryFilter = document.getElementById('category-filter');
+        if (categoryFilter) categoryFilter.addEventListener('change', this.filterProducts.bind(this));
+
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', this.clearFilters.bind(this));
+
+        // Cart
+        const continueShoppingBtn = document.getElementById('continue-shopping-btn');
+        if (continueShoppingBtn) continueShoppingBtn.addEventListener('click', () => this.showSection('products-section'));
+
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) checkoutBtn.addEventListener('click', this.checkout.bind(this));
+    }
+
+    /**
+     * Shows a specific section and hides others.
+     * @param {string} sectionId - The ID of the section to show.
+     */
+    showSection(sectionId) {
+        document.querySelectorAll('main > section').forEach(section => {
+            section.classList.add('hidden');
+            section.classList.remove('active');
+        });
+        toggleVisibility('#' + sectionId, true);
+
+        // Load data for specific sections
+        if (sectionId === 'products-section') {
+            this.loadProducts();
+        } else if (sectionId === 'cart-section') {
+            this.loadCart();
         }
+    }
 
-        // Function to show welcome message and hide forms
-        function showWelcome() {
-            const authPage = document.getElementById('auth-page');
-            authPage.innerHTML = `
-                <h2>Welcome 👋</h2>
-                <p>You are now logged in to Shopping App.</p>
-                <button id="logout-button">Logout</button>
+    /**
+     * Checks authentication status on load.
+     */
+    async checkAuthStatus() {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_AUTH, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'validate' })
+            });
+            const data = await response.json();
+            if (data.valid) {
+                this.currentUser = data.user_id;
+                this.updateNav(true);
+                this.loadLists();
+            } else {
+                this.updateNav(false);
+            }
+        } catch (error) {
+            console.error('Auth check failed:', error);
+        }
+    }
+
+    /**
+     * Updates navigation based on auth status.
+     * @param {boolean} loggedIn - Whether user is logged in.
+     */
+    updateNav(loggedIn) {
+        const loggedInNav = document.querySelectorAll('#nav-lists, #nav-cart, #nav-logout');
+        const loggedOutNav = document.querySelectorAll('#nav-login, #nav-register');
+        loggedInNav.forEach(el => el.style.display = loggedIn ? 'block' : 'none');
+        loggedOutNav.forEach(el => el.style.display = loggedIn ? 'none' : 'block');
+    }
+
+    /**
+     * Handles login form submission.
+     * @param {Event} event - The form submit event.
+     */
+    async handleLogin(event) {
+        event.preventDefault();
+        const identifier = document.getElementById('login-identifier').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_AUTH, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'login', identifier, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.currentUser = data.user_id;
+                this.updateNav(true);
+                this.showSection('lists-section');
+                this.loadLists();
+            } else {
+                showMessage(data.message || LANG.LOGIN_FAILED);
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Handles register form submission.
+     * @param {Event} event - The form submit event.
+     */
+    async handleRegister(event) {
+        event.preventDefault();
+        const username = document.getElementById('register-username').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_AUTH, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'register', username, email, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                showMessage(LANG.REGISTER_SUCCESS);
+                this.showSection('login-section');
+            } else {
+                showMessage(data.message || LANG.REGISTER_FAILED);
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Logs out the user.
+     */
+    async logout() {
+        try {
+            await fetch(LANG.API_BASE + LANG.API_AUTH, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ action: 'logout' })
+            });
+            this.currentUser = null;
+            this.updateNav(false);
+            this.showSection('home-section');
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Loads shopping lists from API.
+     */
+    async loadLists() {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            this.lists = data.lists || [];
+            this.renderLists();
+
+            // Update quick add form lists
+            if (typeof populateListSelect === 'function') {
+                populateListSelect();
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Renders the lists in the UI.
+     */
+    renderLists() {
+            const container = document.getElementById('lists-container');
+            container.innerHTML = '';
+            this.lists.forEach(list => {
+                        const listEl = document.createElement('div');
+                        listEl.className = 'list-item';
+                        listEl.innerHTML = `
+                <h3>${list.name}</h3>
+                <div class="item-controls">
+                    <button onclick="app.sortList('${list.id}', 'name', true)">Sort A-Z</button>
+                    <button onclick="app.sortList('${list.id}', 'name', false)">Sort Z-A</button>
+                    <button onclick="app.addItem('${list.id}')">Add Item</button>
+                    <button onclick="app.deleteList('${list.id}')">Delete List</button>
+                </div>
+                <div class="items">
+                    ${list.items.map(item => `
+                        <div class="item">
+                            <h4>${item.name} (${item.category}) - Qty: ${item.quantity}</h4>
+                            <div class="item-controls">
+                                <button onclick="app.editItem('${item.id}', '${list.id}')">Edit</button>
+                                <button onclick="app.deleteItem('${item.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             `;
+            container.appendChild(listEl);
+        });
+    }
 
-            const logoutButton = document.getElementById('logout-button');
-            logoutButton.addEventListener('click', () => {
-                fetch('auth.php', {
+    /**
+     * Creates a new list.
+     */
+    async createList() {
+        const name = prompt('Enter list name:');
+        if (name) {
+            try {
+                const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=logout'
-                })
-                .then(res => res.json())
-                .then(data => {
-                    authPage.innerHTML = `
-                        <h2>Registration / Login</h2>
-                        <p style="color:green;">${data.message}</p>
-                        <p>Reload the page or log in again to continue.</p>
-                    `;
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ name })
                 });
+                const data = await response.json();
+                if (data.success) {
+                    this.loadLists();
+                }
+            } catch (error) {
+                showMessage(LANG.ERROR);
+            }
+        }
+    }
+
+    /**
+     * Sorts a list by key.
+     * @param {string} listId - The list ID.
+     * @param {string} key - The sort key.
+     * @param {boolean} ascending - Sort order.
+     */
+    sortList(listId, key, ascending) {
+        const list = this.lists.find(l => l.id == listId);
+        if (list) {
+            list.items = sortByKey(list.items, key, ascending);
+            this.renderLists();
+        }
+    }
+
+    /**
+     * Adds an item to a list.
+     * @param {string} listId - The list ID.
+     */
+    async addItem(listId) {
+        const name = prompt('Item name:');
+        const category = prompt('Category:');
+        const quantity = parseInt(prompt('Quantity:', 1)) || 1;
+        if (name) {
+            try {
+                const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ list_id: listId, name, category, quantity })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.loadLists();
+                }
+            } catch (error) {
+                showMessage(LANG.ERROR);
+            }
+        }
+    }
+
+    /**
+     * Edits an item.
+     * @param {string} itemId - The item ID.
+     * @param {string} listId - The list ID.
+     */
+    async editItem(itemId, listId) {
+        const list = this.lists.find(l => l.id == listId);
+        const item = list ? list.items.find(i => i.id == itemId) : null;
+        if (!item) return;
+
+        const name = prompt('Item name:', item.name);
+        const category = prompt('Category:', item.category);
+        const quantity = parseInt(prompt('Quantity:', item.quantity)) || 1;
+
+        if (name) {
+            try {
+                const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ item_id: itemId, name, category, quantity })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    this.loadLists();
+                }
+            } catch (error) {
+                showMessage(LANG.ERROR);
+            }
+        }
+    }
+
+    /**
+     * Deletes an item.
+     * @param {string} itemId - The item ID.
+     */
+    async deleteItem(itemId) {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ item_id: itemId })
             });
+            const data = await response.json();
+            if (data.success) {
+                this.loadLists();
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Deletes a list.
+     * @param {string} listId - The list ID.
+     */
+    async deleteList(listId) {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ list_id: listId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.loadLists();
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Updates the cart counter.
+     */
+    async updateCartCounter() {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PANIER);
+            const data = await response.json();
+            updateCartCounter(data.total_count || 0);
+        } catch (error) {
+            console.error('Counter update failed:', error);
+        }
+    }
+
+    /**
+     * Validates a form and toggles submit button.
+     * @param {HTMLFormElement} form - The form element.
+     */
+    validateForm(form) {
+        const button = form.querySelector('button[type="submit"]');
+        toggleSubmitButton('#' + form.id, '#' + button.id);
+    }
+
+    /**
+     * Loads stored data from localStorage.
+     */
+    loadStoredData() {
+        // Load theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.body.classList.add(savedTheme);
+            this.updateThemeButton(savedTheme === 'dark-theme');
         }
 
-        // Load shopping lists
-        function loadLists() {
-    fetch('api.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'action=get',
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const tbody = document.getElementById('lists-body');
-        tbody.innerHTML = '';
-        if (data.success && data.lists.length > 0) {
-            data.lists.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.product_name}</td>
-                    <td><input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)"></td>
-                    <td>${item.price} €</td>
-                    <td><button onclick="removeItem(${item.id})" data-lang="remove">Remove</button></td>
-                `;
-                tbody.appendChild(row);
-            });
-        } else {
-            tbody.innerHTML = '<tr><td colspan="4" data-lang="noItems">No items in the list</td></tr>';
+        // Initialize language
+        initLanguage();
+
+        // Load products if on products page
+        if (document.getElementById('products-section').classList.contains('active')) {
+            this.loadProducts();
         }
-    })
-    .catch(error => console.error('Error loading lists:', error));
+    }
+
+    /**
+     * Toggles between light and dark themes.
+     */
+    toggleTheme() {
+        const body = document.body;
+        const isDark = body.classList.contains('dark-theme');
+
+        if (isDark) {
+            body.classList.remove('dark-theme');
+            localStorage.setItem('theme', '');
+        } else {
+            body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark-theme');
+        }
+
+        this.updateThemeButton(!isDark);
+    }
+
+    /**
+     * Updates the theme toggle button icon.
+     * @param {boolean} isDark - Whether dark theme is active.
+     */
+    updateThemeButton(isDark) {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+        }
+
+        const heroThemeToggle = document.getElementById('hero-theme-toggle');
+        if (heroThemeToggle) {
+            heroThemeToggle.textContent = isDark ? '☀️' : '🌙';
+        }
+    }
+
+    /**
+     * Loads products from API.
+     */
+    async loadProducts() {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PRODUCTS);
+            const data = await response.json();
+            this.products = data.products || [];
+            this.renderProducts();
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Renders products in the UI.
+     */
+    renderProducts() {
+        const container = document.getElementById('products-grid');
+        container.innerHTML = '';
+
+        const filteredProducts = this.filterProductsList();
+
+        if (filteredProducts.length === 0) {
+            container.innerHTML = '<p>No products found.</p>';
+            return;
+        }
+
+        filteredProducts.forEach(product => {
+            const productEl = document.createElement('div');
+            productEl.className = 'product-card';
+            productEl.innerHTML = `
+                <img src="${product.image || 'assets/default-product.jpg'}" alt="${product.name}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-name">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <p class="product-price">$${product.price}</p>
+                    <p class="product-category">${product.category}</p>
+                    <button onclick="app.addToCart('${product.id}')" class="btn btn-primary">${LANG.ADD_TO_CART}</button>
+                </div>
+            `;
+            container.appendChild(productEl);
+        });
+    }
+
+    /**
+     * Filters products based on search and category.
+     */
+    filterProducts() {
+        this.renderProducts();
+    }
+
+    /**
+     * Gets filtered products list.
+     * @returns {Array} Filtered products.
+     */
+    filterProductsList() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const categoryFilter = document.getElementById('category-filter').value;
+
+        return this.products.filter(product => {
+            const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
+                                product.description.toLowerCase().includes(searchTerm);
+            const matchesCategory = !categoryFilter || product.category === categoryFilter;
+            return matchesSearch && matchesCategory;
+        });
+    }
+
+    /**
+     * Clears all filters.
+     */
+    clearFilters() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('category-filter').value = '';
+        this.renderProducts();
+    }
+
+    /**
+     * Adds a product to cart.
+     * @param {string} productId - The product ID.
+     */
+    async addToCart(productId) {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PANIER, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId, quantity: 1 })
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.updateCartCounter();
+                // Removed the "Item added to cart" message
+            } else {
+                showMessage(data.message || LANG.ERROR);
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Loads cart items.
+     */
+    async loadCart() {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PANIER);
+            const data = await response.json();
+            this.cart = data.cart || [];
+            this.renderCart();
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Renders cart items.
+     */
+    renderCart() {
+        const container = document.getElementById('cart-items');
+        container.innerHTML = '';
+
+        if (this.cart.length === 0) {
+            container.innerHTML = '<p>Your cart is empty.</p>';
+            document.getElementById('cart-total-items').textContent = '0';
+            document.getElementById('cart-total-price').textContent = '0.00';
+            return;
+        }
+
+        let totalItems = 0;
+        let totalPrice = 0;
+
+        this.cart.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'cart-item';
+            itemEl.innerHTML = `
+                <img src="${item.image || 'assets/default-product.jpg'}" alt="${item.name}" class="cart-item-image">
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <p>$${item.price} x ${item.quantity}</p>
+                    <p>Subtotal: $${(item.price * item.quantity).toFixed(2)}</p>
+                </div>
+                <div class="cart-item-controls">
+                    <button onclick="app.updateCartItem('${item.id}', ${item.quantity - 1})">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="app.updateCartItem('${item.id}', ${item.quantity + 1})">+</button>
+                    <button onclick="app.removeFromCart('${item.id}')" class="btn btn-secondary">Remove</button>
+                </div>
+            `;
+            container.appendChild(itemEl);
+
+            totalItems += item.quantity;
+            totalPrice += item.price * item.quantity;
+        });
+
+        document.getElementById('cart-total-items').textContent = totalItems;
+        document.getElementById('cart-total-price').textContent = totalPrice.toFixed(2);
+    }
+
+    /**
+     * Updates cart item quantity.
+     * @param {string} itemId - The cart item ID.
+     * @param {number} quantity - New quantity.
+     */
+    async updateCartItem(itemId, quantity) {
+        if (quantity <= 0) {
+            this.removeFromCart(itemId);
+            return;
+        }
+
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PANIER, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item_id: itemId, quantity })
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.loadCart();
+                this.updateCartCounter();
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Removes item from cart.
+     * @param {string} itemId - The cart item ID.
+     */
+    async removeFromCart(itemId) {
+        try {
+            const response = await fetch(LANG.API_BASE + LANG.API_PANIER, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item_id: itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                this.loadCart();
+                this.updateCartCounter();
+            }
+        } catch (error) {
+            showMessage(LANG.ERROR);
+        }
+    }
+
+    /**
+     * Handles checkout process.
+     */
+    checkout() {
+        alert('Checkout functionality would be implemented here. This would typically redirect to a payment processor.');
+    }
 }
 
-        // Update quantity
-        function updateQuantity(id, quantity) {
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `action=update&id=${id}&quantity=${quantity}`,
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) alert('Update error');
-            });
-        }
-
-        // Remove item
-        function removeItem(id) {
-            fetch('api.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `action=remove&id=${id}`,
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) loadLists(); // Reload the list
-                else alert('Removal error');
-            });
-        }
-
-        // Add new item
-        document.getElementById('add-new-item')?.addEventListener('click', () => {
-            const productName = prompt('Product name:');
-            const price = parseFloat(prompt('Price (€):'));
-            if (productName && price > 0) {
-                fetch('api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=add&product_name=${encodeURIComponent(productName)}&price=${price}`,
-                    credentials: 'include'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) loadLists(); // Reload the list
-                    else alert('Add error');
-                });
-            }
-        });
-
-        // User profile
-        const userProfile = document.getElementById('user-profile');
-        const userInitial = document.getElementById('user-initial');
-        const profileMenu = document.getElementById('profile-menu');
-
-        if (userProfile) {
-            userProfile.addEventListener('click', () => {
-                profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
-            });
-        }
-
-        document.getElementById('view-lists')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            pages.forEach(page => page.classList.remove('active'));
-            document.getElementById('lists-page').classList.add('active');
-            loadLists();
-        });
-
-        document.getElementById('view-profile')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Profile to implement');
-        });
-
-        document.getElementById('logout')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            fetch('auth.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'action=logout',
-                credentials: 'include'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) location.reload();
-            });
-        });
-
-        // After successful login, show the initial (pass the username from the response)
-        function showUserProfile(username) {
-            if (userProfile) userProfile.style.display = 'inline-block';
-            if (userInitial) userInitial.textContent = username.charAt(0).toUpperCase();
-        }
-
-        // In the login function, after data.success:
-        // showUserProfile(username); // Retrieve the username from DB or store it
-
-        // Load lists when going to the Lists page
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                // ... existing code ...
-                if (pageId === 'lists-page') {
-                    loadLists();
-                }
-            });
-        });
-    }
-});
+// Initialize the app
+const app = new ShoppingApp();

@@ -1,71 +1,127 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+// auth.php - Authentication functions
 
 require_once 'config.php';
 require_once 'session.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit(0);
-}
-
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'register') {
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Erreur préparation: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("sss", $username, $email, $password);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Inscription réussie']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Erreur inscription: ' . $stmt->error]);
-        }
-        $stmt->close();
-    } elseif ($action === 'login') {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        $stmt = $conn->prepare("SELECT id, password FROM users WHERE email = ?");
-        if (!$stmt) {
-            echo json_encode(['success' => false, 'message' => 'Erreur préparation: ' . $conn->error]);
-            exit;
-        }
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if (password_verify($password, $row['password'])) {
-                $_SESSION['user_id'] = $row['id'];
-                echo json_encode(['success' => true, 'message' => 'Connexion réussie']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Mot de passe incorrect']);
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé']);
-        }
-        $stmt->close();
-    } elseif ($action === 'logout') {
-        logout();
-        echo json_encode(['success' => true, 'message' => 'Déconnexion réussie']);
+/**
+ * Registers a new user with username, email, and password.
+ *
+ * @param string $username The username (string).
+ * @param string $email The email address (string).
+ * @param string $password The plain text password (string).
+ * @return array Associative array with 'success' (bool) and 'message' (string).
+ */
+function registerUser($username, $email, $password) {
+    // Validate inputs
+    if (empty($username) || empty($email) || empty($password)) {
+        return ['success' => false, 'message' => 'All fields are required.'];
     }
-} else {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'Invalid email format.'];
+    }
+    if (strlen($password) < 8) {
+        return ['success' => false, 'message' => 'Password must be at least 8 characters long.'];
+    }
+
+    try {
+        $pdo = getDbConnection();
+
+        // Check if username or email already exists
+        $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ? OR email = ?');
+        $stmt->execute([$username, $email]);
+        if ($stmt->fetch()) {
+            return ['success' => false, 'message' => 'Username or email already exists.'];
+        }
+
+        // Hash password
+        $passwordHash = password_hash($password, HASH_ALGO);
+
+        // Insert new user
+        $stmt = $pdo->prepare('INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, NOW())');
+        $stmt->execute([$username, $email, $passwordHash]);
+
+        return ['success' => true, 'message' => 'User registered successfully.'];
+    } catch (PDOException $e) {
+        error_log('Registration failed: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Registration failed. Please try again.'];
+    }
 }
-$conn->close();
+
+/**
+ * Logs in a user with username/email and password.
+ *
+ * @param string $identifier The username or email (string).
+ * @param string $password The plain text password (string).
+ * @return array Associative array with 'success' (bool), 'message' (string), and optionally 'user_id' (int).
+ */
+function loginUser($identifier, $password) {
+    // Validate inputs
+    if (empty($identifier) || empty($password)) {
+        return ['success' => false, 'message' => 'Username/email and password are required.'];
+    }
+
+    try {
+        $pdo = getDbConnection();
+
+        // Find user by username or email
+        $stmt = $pdo->prepare('SELECT id, username, email, password_hash FROM users WHERE username = ? OR email = ?');
+        $stmt->execute([$identifier, $identifier]);
+        $user = $stmt->fetch();
+
+        // Debug logging (remove in production)
+        error_log('Login attempt for identifier: ' . $identifier);
+        error_log('User found: ' . ($user ? 'yes' : 'no'));
+        if ($user) {
+            error_log('User ID: ' . $user['id']);
+            error_log('Password hash exists: ' . (!empty($user['password_hash']) ? 'yes' : 'no'));
+            $passwordValid = password_verify($password, $user['password_hash']);
+            error_log('Password verification result: ' . ($passwordValid ? 'valid' : 'invalid'));
+        }
+
+        if (!$user) {
+            error_log('Login failed: User not found');
+            return ['success' => false, 'message' => 'Invalid credentials.'];
+        }
+
+        // Verify password
+        if (!password_verify($password, $user['password_hash'])) {
+            error_log('Login failed: Invalid password');
+            return ['success' => false, 'message' => 'Invalid credentials.'];
+        }
+
+        // Start session and set user ID
+        startSecureSession();
+        $_SESSION['user_id'] = $user['id'];
+        regenerateSessionId();
+
+        error_log('Login successful for user ID: ' . $user['id']);
+        return ['success' => true, 'message' => 'Login successful.', 'user_id' => $user['id']];
+    } catch (PDOException $e) {
+        error_log('Login failed with exception: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Login failed. Please try again.'];
+    }
+}
+
+/**
+ * Logs out the current user.
+ *
+ * @return array Associative array with 'success' (bool) and 'message' (string).
+ */
+function logoutUser() {
+    destroySession();
+    return ['success' => true, 'message' => 'Logout successful.'];
+}
+
+/**
+ * Validates the current session and user authentication.
+ *
+ * @return array Associative array with 'valid' (bool) and optionally 'user_id' (int).
+ */
+function validateSession() {
+    if (isLoggedIn()) {
+        return ['valid' => true, 'user_id' => getCurrentUserId()];
+    }
+    return ['valid' => false];
+}
 ?>
