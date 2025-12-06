@@ -22,6 +22,11 @@ async function populateListSelect() {
     const listSelect = document.getElementById('quick-list-select');
     if (!listSelect) return;
 
+    if (window.location.protocol === 'file:') {
+        listSelect.innerHTML = '<option value="">Lists unavailable (run via server)</option>';
+        return;
+    }
+
     try {
         const response = await fetch(LANG.API_BASE + LANG.API_LISTS, {
             credentials: 'include'

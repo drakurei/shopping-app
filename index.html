@@ -53,6 +53,9 @@
         </section>
         <!-- Login Section -->
         <section id="login-section" class="section hidden">
+            <div class="section-nav">
+                <button id="login-home-btn" class="btn btn-secondary" data-lang="HOME">Home</button>
+            </div>
             <div class="form-container">
                 <h2 data-lang="LOGIN">Login</h2>
                 <form id="login-form" class="auth-form">
@@ -68,12 +71,15 @@
                     </div>
                     <button type="submit" id="login-submit-btn" class="btn btn-primary" disabled data-lang="LOGIN">Login</button>
                 </form>
-                <p data-lang="NO_ACCOUNT">Don't have an account? <a href="#" id="switch-to-register" data-lang="REGISTER_HERE">Register here</a></p>
+                <p class="auth-links"><a href="#" id="switch-to-register" data-lang="NO_ACCOUNT">Don't have an account? Register here</a></p>
             </div>
         </section>
 
         <!-- Register Section -->
         <section id="register-section" class="section hidden">
+            <div class="section-nav">
+                <button id="register-home-btn" class="btn btn-secondary" data-lang="HOME">Home</button>
+            </div>
             <div class="form-container">
                 <h2 data-lang="REGISTER">Register</h2>
                 <form id="register-form" class="auth-form">
@@ -94,7 +100,7 @@
                     </div>
                     <button type="submit" id="register-submit-btn" class="btn btn-primary" disabled data-lang="REGISTER">Register</button>
                 </form>
-                <p data-lang="HAVE_ACCOUNT">Already have an account? <a href="#" id="switch-to-login" data-lang="LOGIN_HERE">Login here</a></p>
+                <p class="auth-links"><a href="#" id="switch-to-login" data-lang="HAVE_ACCOUNT">Already have an account? Login here</a></p>
             </div>
         </section>
         <!-- Lists Section -->

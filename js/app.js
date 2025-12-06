@@ -15,6 +15,12 @@ class ShoppingApp {
      * Initializes the application.
      */
     init() {
+        if (window.location.protocol === 'file:') {
+            showMessage('Please run this app through a web server (e.g., XAMPP) at http://localhost/shopping-app/ for full functionality.');
+            this.bindEvents();
+            this.loadStoredData();
+            return;
+        }
         this.bindEvents();
         this.checkAuthStatus();
         this.loadStoredData();
@@ -132,6 +138,12 @@ class ShoppingApp {
 
         const listsLogoutBtn = document.getElementById('lists-logout-btn');
         if (listsLogoutBtn) listsLogoutBtn.addEventListener('click', this.logout.bind(this));
+
+        const loginHomeBtn = document.getElementById('login-home-btn');
+        if (loginHomeBtn) loginHomeBtn.addEventListener('click', () => this.showSection('home-section'));
+
+        const registerHomeBtn = document.getElementById('register-home-btn');
+        if (registerHomeBtn) registerHomeBtn.addEventListener('click', () => this.showSection('home-section'));
 
         // Products
         const productsHomeBtn = document.getElementById('products-home-btn');
