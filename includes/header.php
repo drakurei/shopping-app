@@ -1,39 +1,49 @@
 <?php
-// includes/header.php - Reusable header with navigation
+// includes/header.php - Page header and navigation
 
-require_once '../session.php';
-$isLoggedIn = isLoggedIn();
+$pageTitle = $pageTitle ?? 'Shopping App';
+$user = current_user();
+$flashes = get_flashes();
 ?>
-<header>
-    <div class="header-container">
-        <h1 id="app-title" data-lang="WELCOME">Shopping App</h1>
-        <nav>
-            <ul class="nav-menu">
-                <li><a href="#" id="nav-home" data-lang="HOME">Home</a></li>
-                <li><a href="#" id="nav-products" data-lang="SHOP_PRODUCTS">Products</a></li>
-                <li><a href="#" id="nav-cart" data-lang="SHOPPING_CART">🛒 Cart <span id="total-count">0</span></a></li>
-                <?php if ($isLoggedIn): ?>
-                    <li><a href="#" id="nav-lists" data-lang="MY_LISTS">My Lists</a></li>
-                    <li><a href="#" id="nav-logout" data-lang="LOGOUT">Logout</a></li>
-                <?php else: ?>
-                    <li><a href="#" id="nav-login" data-lang="LOGIN">Login</a></li>
-                    <li><a href="#" id="nav-register" data-lang="REGISTER">Register</a></li>
-                <?php endif; ?>
-            </ul>
-            <div class="nav-home-link">
-                <a href="#" id="nav-home-alt" class="btn btn-secondary" data-lang="HOME">Home</a>
-            </div>
-        </nav>
-        <div class="header-controls">
-            <select id="lang-selector" class="lang-selector">
-                <option value="en">EN</option>
-                <option value="fr">FR</option>
-                <option value="pt">PT</option>
-                <option value="es">ES</option>
-                <option value="de">DE</option>
-                <option value="ko">KO</option>
-            </select>
-            <button id="theme-toggle" class="theme-toggle-btn" data-lang="THEME_TOGGLE">🌙</button>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle); ?></title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <h1 class="logo"><a href="index.php">Shopping App</a></h1>
+            <nav>
+                <ul class="nav-list">
+                    <li><a href="index.php" class="nav-link">Products</a></li>
+                    <?php if ($user): ?>
+                        <li><a href="cart.php" class="nav-link">My Cart</a></li>
+                        <li class="nav-user">Hi, <?= htmlspecialchars($user['name']); ?></li>
+                        <li><a href="logout.php" class="nav-link">Logout</a></li>
+                    <?php else: ?>
+                        <li><a href="login.php" class="nav-link">Login</a></li>
+                        <li><a href="register.php" class="nav-link">Create Account</a></li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
         </div>
-    </div>
-</header>
+    </header>
+    <main class="container">
+        <?php if ($flashes): ?>
+            <div class="flash-wrapper">
+                <?php foreach ($flashes as $type => $messages): ?>
+                    <?php foreach ($messages as $message): ?>
+                        <div class="flash flash-<?= htmlspecialchars($type); ?>">
+                            <span><?= htmlspecialchars($message); ?></span>
+                            <button type="button" class="flash-close" data-dismiss="flash">&times;</button>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>

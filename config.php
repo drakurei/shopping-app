@@ -1,45 +1,85 @@
 <?php
-// config.php - Database configuration and constants
+// config.php - Core configuration and helper functions
 
-// Database constants
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'shopping_app');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+declare(strict_types=1);
 
-// Security constants
-define('HASH_ALGO', PASSWORD_DEFAULT); // For password hashing
-define('SESSION_LIFETIME', 3600); // 1 hour in seconds
+require_once __DIR__ . '/session.php';
 
-// API constants
-define('API_VERSION', 'v1');
-define('JSON_CONTENT_TYPE', 'application/json');
-
-// Error reporting (disable in production)
-error_reporting(0);
-ini_set('display_errors', 0);
-
-// Timezone
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 date_default_timezone_set('UTC');
 
-// Function to get database connection
+define('DB_HOST', 'localhost');
+define('DB_PORT', 8889);
+define('DB_NAME', 'shopping_app');
+define('DB_USER', 'root');
+define('DB_PASS', 'root');
+
 /**
- * Establishes and returns a PDO database connection.
- *
- * @return PDO The database connection object.
- * @throws PDOException If connection fails.
+ * Returns a shared PDO instance.
  */
-function getDbConnection() {
-    try {
-        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8';
-        $pdo = new PDO($dsn, DB_USER, DB_PASS);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+function db(): PDO {
+    static $pdo = null;
+
+    if ($pdo instanceof PDO) {
         return $pdo;
-    } catch (PDOException $e) {
-        // Log error and throw
-        error_log('Database connection failed: ' . $e->getMessage());
-        throw new PDOException('Database connection failed.');
     }
+
+    $dsn = sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', DB_HOST, DB_PORT, DB_NAME);
+    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+
+    return $pdo;
+}
+
+function redirect(string $path): void {
+    header('Location: ' . $path);
+    exit;
+}
+
+function is_logged_in(): bool {
+    return isset($_SESSION['user_id']);
+}
+
+function current_user(): ?array {
+    return $_SESSION['user'] ?? null;
+}
+
+function log_in_user(array $user): void {
+    $_SESSION['user_id'] = (int) $user['id'];
+    $_SESSION['user'] = [
+        'id' => (int) $user['id'],
+        'name' => $user['name'] ?? '',
+        'email' => $user['email'] ?? ''
+    ];
+    regenerate_session();
+}
+
+function logout_user(): void {
+    $_SESSION = [];
+    regenerate_session();
+}
+
+function require_login(): void {
+    if (!is_logged_in()) {
+        set_flash('error', 'Please login to continue.');
+        redirect('login.php');
+    }
+}
+
+function set_flash(string $type, string $message): void {
+    $_SESSION['flash'][$type][] = $message;
+}
+
+function get_flashes(): array {
+    $flashes = $_SESSION['flash'] ?? [];
+    unset($_SESSION['flash']);
+    return $flashes;
+}
+
+function sanitize(string $value): string {
+    return trim(filter_var($value, FILTER_UNSAFE_RAW));
 }
 ?>

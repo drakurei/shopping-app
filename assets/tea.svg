@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="24" fill="#e8f5e9"/>
+  <rect x="50" y="70" width="80" height="50" rx="20" fill="#a5d6a7"/>
+  <rect x="60" y="45" width="60" height="40" rx="10" fill="#c8e6c9"/>
+  <path d="M130 80 q20 15 0 30" stroke="#81c784" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <text x="90" y="160" font-family="Arial" font-size="18" fill="#388e3c" text-anchor="middle">Herbal Tea</text>
+</svg>

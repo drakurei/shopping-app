@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="24" fill="#f9e0e0"/>
+  <circle cx="90" cy="90" r="55" fill="#e74c3c"/>
+  <circle cx="110" cy="80" r="40" fill="#c0392b" opacity="0.8"/>
+  <path d="M90 40 C95 30 110 30 118 44" stroke="#2c3e50" stroke-width="6" fill="none"/>
+  <circle cx="70" cy="70" r="12" fill="white" opacity="0.5"/>
+  <text x="90" y="150" font-family="Arial" font-size="18" fill="#b33939" text-anchor="middle">Apples</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <rect width="180" height="180" rx="24" fill="#fff3e0"/>
+  <rect x="65" y="40" width="50" height="100" rx="14" fill="#ff9800"/>
+  <rect x="60" y="30" width="60" height="20" rx="8" fill="#ffe0b2"/>
+  <circle cx="90" cy="90" r="20" fill="#ffcc80"/>
+  <text x="90" y="160" font-family="Arial" font-size="18" fill="#ef6c00" text-anchor="middle">Orange Juice</text>
+</svg>
