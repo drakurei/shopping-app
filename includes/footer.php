@@ -19,6 +19,7 @@
     <script src="js/flash.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/cart-count.js"></script>
+    <script src="js/aisle-filter.js"></script>
 </body>
 
 </html>

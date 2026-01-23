@@ -157,6 +157,38 @@ a {
     margin: 2rem 0;
 }
 
+.aisle-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin: 1.25rem 0 0.5rem;
+}
+
+.aisle-label {
+    font-weight: 600;
+    color: #1f2c33;
+}
+
+.aisle-strip select {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    color: #1f2c33;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+}
+
+.aisle-tag {
+    align-self: flex-start;
+    background: rgba(43, 122, 120, 0.12);
+    color: #1f2c33;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 .card {
     background: #fff;
     padding: 1rem;
