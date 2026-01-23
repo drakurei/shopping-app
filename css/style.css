@@ -37,7 +37,9 @@ a {
 .header-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.6rem;
     padding: 1rem 0;
 }
 
@@ -71,6 +73,8 @@ a {
     margin: 0;
     padding: 0;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .nav-link {
@@ -249,7 +253,8 @@ select {
 }
 
 .auth-wrapper,
-.cart-wrapper {
+.cart-wrapper,
+.content-card {
     background: #fff;
     padding: 2rem;
     border-radius: 8px;
@@ -290,14 +295,49 @@ select {
     text-align: center;
 }
 
-@media (max-width: 640px) {
+textarea {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.footer-links,
+.footer-social {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-links a,
+.footer-social a {
+    color: #ddd;
+    font-weight: 500;
+}
+
+@media (min-width: 700px) {
     .header-inner {
-        flex-direction: column;
-        gap: 0.5rem;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     .nav-list {
-        flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-end;
+    }
+
+    .footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
     }
 }

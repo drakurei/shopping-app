@@ -8,6 +8,11 @@ if (is_logged_in()) {
 $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate($_POST['csrf_token'] ?? null)) {
+        set_flash('error', 'Invalid form token. Please try again.');
+        redirect('login.php');
+    }
+
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $result = attempt_login($email, $password);
@@ -27,6 +32,7 @@ include __DIR__ . '/includes/header.php';
 <section class="auth-wrapper">
     <h2>Login</h2>
     <form method="post" novalidate>
+        <?= csrf_field(); ?>
         <label for="email">Email</label>
         <input type="email" id="email" name="email" required value="<?= htmlspecialchars($email); ?>">
 

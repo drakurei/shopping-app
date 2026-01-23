@@ -9,6 +9,11 @@ $name = '';
 $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate($_POST['csrf_token'] ?? null)) {
+        set_flash('error', 'Invalid form token. Please try again.');
+        redirect('register.php');
+    }
+
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -33,6 +38,7 @@ include __DIR__ . '/includes/header.php';
 <section class="auth-wrapper">
     <h2>Create Account</h2>
     <form method="post" novalidate>
+        <?= csrf_field(); ?>
         <label for="name">Name</label>
         <input type="text" id="name" name="name" required value="<?= htmlspecialchars($name); ?>">
 

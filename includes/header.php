@@ -3,14 +3,9 @@
 
 $pageTitle = $pageTitle ?? 'Shopping App';
 $user = current_user();
-$userInitial = '';
 $cartCount = 0;
 $hasUser = $user !== null;
 if ($hasUser) {
-    $name = trim((string) ($user['name'] ?? ''));
-    if ($name !== '') {
-        $userInitial = strtoupper(substr($name, 0, 1));
-    }
     $cartCount = cart_item_count((int) $user['id']);
 }
 $flashes = get_flashes();

@@ -8,6 +8,11 @@ $userId = (int) $_SESSION['user_id'];
 $action = $_GET['action'] ?? 'view';
 
 if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate($_POST['csrf_token'] ?? null)) {
+        set_flash('error', 'Invalid form token. Please try again.');
+        redirect('index.php');
+    }
+
     $productId = (int) ($_POST['product_id'] ?? 0);
     $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
 
@@ -25,6 +30,11 @@ if ($action === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate($_POST['csrf_token'] ?? null)) {
+        set_flash('error', 'Invalid form token. Please try again.');
+        redirect('cart.php');
+    }
+
     $productId = (int) ($_POST['product_id'] ?? 0);
     $quantity = max(1, (int) ($_POST['quantity'] ?? 1));
 
@@ -35,6 +45,11 @@ if ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'remove' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validate($_POST['csrf_token'] ?? null)) {
+        set_flash('error', 'Invalid form token. Please try again.');
+        redirect('cart.php');
+    }
+
     $productId = (int) ($_POST['product_id'] ?? 0);
     $stmt = $pdo->prepare('DELETE FROM cart_items WHERE user_id = ? AND product_id = ?');
     $stmt->execute([$userId, $productId]);
@@ -77,6 +92,7 @@ include __DIR__ . '/includes/header.php';
                         <td>$<?= number_format((float) $item['price'], 2); ?></td>
                         <td>
                             <form action="cart.php?action=update" method="post" class="cart-form">
+                                <?= csrf_field(); ?>
                                 <input type="hidden" name="product_id" value="<?= (int) $item['product_id']; ?>">
                                 <input type="number" name="quantity" min="1" value="<?= (int) $item['quantity']; ?>" data-quantity-input>
                                 <button type="submit" class="btn btn-secondary btn-small">Update</button>
@@ -85,6 +101,7 @@ include __DIR__ . '/includes/header.php';
                         <td>$<?= number_format($item['quantity'] * $item['price'], 2); ?></td>
                         <td>
                             <form action="cart.php?action=remove" method="post">
+                                <?= csrf_field(); ?>
                                 <input type="hidden" name="product_id" value="<?= (int) $item['product_id']; ?>">
                                 <button type="submit" class="btn btn-danger" data-confirm-remove>Remove</button>
                             </form>

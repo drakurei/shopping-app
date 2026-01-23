@@ -29,6 +29,7 @@ include __DIR__ . '/includes/header.php';
                     <p><?= htmlspecialchars($product['description']); ?></p>
                     <div class="price">$<?= number_format((float) $product['price'], 2); ?></div>
                     <form action="cart.php?action=add" method="post">
+                        <?= csrf_field(); ?>
                         <input type="hidden" name="product_id" value="<?= (int) $product['id']; ?>">
                         <label for="qty-<?= (int) $product['id']; ?>">Quantity</label>
                         <input type="number" id="qty-<?= (int) $product['id']; ?>" name="quantity" min="1" value="1" <?php if (!is_logged_in()) echo 'disabled'; ?>>
