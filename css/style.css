@@ -13,7 +13,7 @@
 
 body {
     margin: 0;
-    background: #f5f5f5;
+    background: radial-gradient(circle at 20% 20%, #ffffff 0%, #f7f7f7 40%, #eef1f4 100%);
     color: #333;
 }
 
@@ -29,8 +29,9 @@ a {
 }
 
 .site-header {
-    background: var(--accent);
+    background: linear-gradient(120deg, #152127 0%, #1e3a46 55%, #2b7a78 100%);
     color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 .header-inner {
@@ -44,6 +45,23 @@ a {
     color: #fff;
     font-size: 1.5rem;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.logo-mark {
+    width: 1.8rem;
+    height: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-mark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .nav-list {
@@ -58,10 +76,38 @@ a {
 .nav-link {
     color: #fff;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .nav-user {
     color: #ddd;
+}
+
+.nav-icon svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
+}
+
+.nav-emoji {
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-block;
+}
+
+.cart-count {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.35rem;
+    display: inline-block;
+    min-width: 1.5rem;
+    text-align: center;
 }
 
 .flash-wrapper {
@@ -111,10 +157,16 @@ a {
     background: #fff;
     padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
 }
 
 .product-thumb {
@@ -151,6 +203,7 @@ a {
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.15s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .btn-primary {

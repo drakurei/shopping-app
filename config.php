@@ -47,6 +47,13 @@ function current_user(): ?array {
     return $_SESSION['user'] ?? null;
 }
 
+function cart_item_count(int $userId): int {
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT COALESCE(SUM(quantity), 0) FROM cart_items WHERE user_id = ?');
+    $stmt->execute([$userId]);
+    return (int) $stmt->fetchColumn();
+}
+
 function log_in_user(array $user): void {
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['user'] = [
