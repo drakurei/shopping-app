@@ -10,10 +10,10 @@ ini_set('display_errors', '1');
 date_default_timezone_set('UTC');
 
 define('DB_HOST', 'localhost');
-define('DB_PORT', 8889);
+define('DB_PORT', 3306);
 define('DB_NAME', 'shopping_app');
 define('DB_USER', 'root');
-define('DB_PASS', 'root');
+define('DB_PASS', '');
 
 /**
  * Returns a shared PDO instance.
